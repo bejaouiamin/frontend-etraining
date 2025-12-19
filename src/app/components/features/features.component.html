@@ -1,0 +1,46 @@
+<!-- Statistics Section -->
+<section class="statistics-section">
+  <div class="statistics-container">
+    <div class="statistics-header">
+      <h2 class="statistics-title">Our Success</h2>
+      <p class="statistics-description">
+        Ornare id fames interdum porttitor nulla turpis etiam. Diam vitae sollicitudin at nec
+        nam et pharetra gravida. Adipiscing a quis ultrices eu ornare tristique vel nisl orci.
+      </p>
+    </div>
+
+    <div class="statistics-grid">
+      <div class="stat-item" *ngFor="let stat of statistics">
+        <div class="stat-value">{{ stat.value }}</div>
+        <div class="stat-label">{{ stat.label }}</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Features Section -->
+<section class="features-section">
+  <div class="features-container">
+    <div class="features-header">
+      <h2 class="features-title">
+        All-In-One <span class="highlight">Cloud Software.</span>
+      </h2>
+      <p class="features-description">
+        TOTC is one powerful online software suite that combines all the tools
+        needed to run a successful school or office.
+      </p>
+    </div>
+
+    <div class="features-grid">
+      <mat-card class="feature-card" *ngFor="let feature of features">
+        <div class="icon-wrapper" [style.background-color]="feature.color">
+          <mat-icon class="feature-icon">{{ feature.icon }}</mat-icon>
+        </div>
+        <mat-card-content>
+          <h3 class="feature-title">{{ feature.title }}</h3>
+          <p class="feature-description">{{ feature.description }}</p>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+</section>

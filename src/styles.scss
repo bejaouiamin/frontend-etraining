@@ -1,1 +1,43 @@
-/* You can add global styles to this file, and also import other style files */
+// src/styles.scss (global styles)
+@use '@angular/material' as mat;
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+// Custom theme colors
+$primary-palette: (
+  50: #e0f7f7,
+  100: #b3ecec,
+  500: #49BBBD,
+  700: #3a9a9c,
+  contrast: (
+    50: rgba(black, 0.87),
+    100: rgba(black, 0.87),
+    500: white,
+    700: white,
+  )
+);
+
+$custom-primary: mat.m2-define-palette($primary-palette);
+$custom-accent: mat.m2-define-palette(mat.$m2-teal-palette);
+
+$custom-theme: mat.m2-define-light-theme((
+  color: (
+    primary: $custom-primary,
+    accent: $custom-accent,
+  ),
+  typography: mat.m2-define-typography-config(
+    $font-family: 'Poppins, sans-serif'
+  ),
+));
+
+@include mat.all-component-themes($custom-theme);
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background: #FFFEFC;
+}

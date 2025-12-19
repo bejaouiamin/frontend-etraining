@@ -1,0 +1,63 @@
+<header class="header">
+  <div class="header-container">
+    <!-- Logo -->
+    <a routerLink="/home" class="logo">TOTC</a>
+
+    <!-- Navigation -->
+    <nav class="nav-links">
+      <a *ngFor="let link of navLinks"
+         [routerLink]="link.path"
+         routerLinkActive="active"
+         class="nav-link">
+        {{ link.label }}
+      </a>
+    </nav>
+
+    <!-- Auth Buttons -->
+    <div class="auth-buttons">
+      <button mat-button class="login-btn" routerLink="/auth/login">
+        Login
+      </button>
+      <button mat-button class="signup-btn" routerLink="/auth/register">
+        Sign Up
+      </button>
+    </div>
+
+    <!-- Mobile menu button with click handler -->
+    <button mat-icon-button class="mobile-menu-btn" (click)="toggleMobileMenu()">
+      <mat-icon>menu</mat-icon>
+    </button>
+  </div>
+</header>
+
+<!-- Fixed mobile menu structure - positioned as fixed overlay outside header -->
+<div class="mobile-menu-overlay" *ngIf="isMobileMenuOpen">
+  <div class="mobile-menu-backdrop" (click)="closeMobileMenu()"></div>
+  <div class="mobile-sidenav">
+    <div class="mobile-menu-header">
+      <span class="mobile-logo">TOTC</span>
+      <button mat-icon-button (click)="closeMobileMenu()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <nav class="mobile-nav">
+      <a *ngFor="let link of navLinks"
+         [routerLink]="link.path"
+         routerLinkActive="active"
+         class="mobile-nav-link"
+         (click)="closeMobileMenu()">
+        {{ link.label }}
+      </a>
+    </nav>
+
+    <div class="mobile-auth-buttons">
+      <button mat-raised-button class="mobile-login-btn" routerLink="/auth/login" (click)="closeMobileMenu()">
+        Login
+      </button>
+      <button mat-raised-button class="mobile-signup-btn" routerLink="/auth/register" (click)="closeMobileMenu()">
+        Sign Up
+      </button>
+    </div>
+  </div>
+</div>
