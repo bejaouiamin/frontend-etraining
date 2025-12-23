@@ -1,9 +1,9 @@
 // typescript
 export interface CandidatRequest {
   id?: number;
-  fullName: string;
-  email: string;
-  password: string;
+  fullName?: string;
+  email?: string;
+  password?: string;
   phone?: string;
   address?: {
     street?: string;

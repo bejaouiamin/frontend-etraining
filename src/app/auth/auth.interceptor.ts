@@ -10,7 +10,6 @@ export class AuthInterceptor implements HttpInterceptor {
   constructor(private keycloak: KeycloakService) {}
 
   intercept(req: HttpRequest<any>, next: HttpHandler) {
-    // endpoints publics de registre peuvent être appelés sans token, mais si token présent on l'ajoute
     return from(this.keycloak.getToken()).pipe(
       switchMap(token => {
         if (token) {

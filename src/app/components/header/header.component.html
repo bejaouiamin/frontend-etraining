@@ -13,24 +13,44 @@
       </a>
     </nav>
 
-    <!-- Auth Buttons -->
-    <div class="auth-buttons">
-      <button mat-button class="login-btn" routerLink="/auth/login">
-        Login
-      </button>
-      <button mat-button class="signup-btn" routerLink="/auth/register">
-        Sign Up
-      </button>
+    <!-- Added auth-section with conditional profile menu or auth buttons -->
+    <div class="auth-section">
+      <!-- Authenticated User - Profile Menu -->
+      <div *ngIf="isAuthenticated" class="profile-menu-wrapper">
+        <button mat-icon-button [matMenuTriggerFor]="profileMenu" class="profile-btn">
+          <mat-icon>account_circle</mat-icon>
+        </button>
+        <mat-menu #profileMenu="matMenu" class="profile-dropdown">
+          <button mat-menu-item (click)="navigateToProfile()">
+            <mat-icon>person</mat-icon>
+            <span>Update Profile</span>
+          </button>
+          <button mat-menu-item (click)="onLogout()">
+            <mat-icon>logout</mat-icon>
+            <span>Disconnect</span>
+          </button>
+        </mat-menu>
+      </div>
+
+      <!-- Unauthenticated - Login/Register Buttons -->
+      <div *ngIf="!isAuthenticated" class="auth-buttons">
+        <button mat-button class="login-btn" routerLink="/auth/login">
+          Login
+        </button>
+        <button mat-button class="signup-btn" routerLink="/auth/register">
+          Sign Up
+        </button>
+      </div>
     </div>
 
-    <!-- Mobile menu button with click handler -->
+    <!-- Mobile menu button -->
     <button mat-icon-button class="mobile-menu-btn" (click)="toggleMobileMenu()">
       <mat-icon>menu</mat-icon>
     </button>
   </div>
 </header>
 
-<!-- Fixed mobile menu structure - positioned as fixed overlay outside header -->
+<!-- Updated mobile menu with conditional auth section -->
 <div class="mobile-menu-overlay" *ngIf="isMobileMenuOpen">
   <div class="mobile-menu-backdrop" (click)="closeMobileMenu()"></div>
   <div class="mobile-sidenav">
@@ -51,13 +71,29 @@
       </a>
     </nav>
 
-    <div class="mobile-auth-buttons">
-      <button mat-raised-button class="mobile-login-btn" routerLink="/auth/login" (click)="closeMobileMenu()">
-        Login
-      </button>
-      <button mat-raised-button class="mobile-signup-btn" routerLink="/auth/register" (click)="closeMobileMenu()">
-        Sign Up
-      </button>
+    <!-- Added mobile auth section with conditional rendering -->
+    <div class="mobile-auth-section">
+      <!-- Authenticated User - Mobile Profile Menu -->
+      <div *ngIf="isAuthenticated" class="mobile-profile-menu">
+        <button mat-button class="mobile-profile-btn" (click)="navigateToProfile(); closeMobileMenu()">
+          <mat-icon>person</mat-icon>
+          <span>Update Profile</span>
+        </button>
+        <button mat-button class="mobile-logout-btn" (click)="onLogout(); closeMobileMenu()">
+          <mat-icon>logout</mat-icon>
+          <span>Disconnect</span>
+        </button>
+      </div>
+
+      <!-- Unauthenticated - Login/Register Buttons -->
+      <div *ngIf="!isAuthenticated" class="mobile-auth-buttons">
+        <button mat-raised-button class="mobile-login-btn" routerLink="/auth/login" (click)="closeMobileMenu()">
+          Login
+        </button>
+        <button mat-raised-button class="mobile-signup-btn" routerLink="/auth/register" (click)="closeMobileMenu()">
+          Sign Up
+        </button>
+      </div>
     </div>
   </div>
 </div>
