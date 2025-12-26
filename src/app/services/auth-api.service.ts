@@ -11,7 +11,7 @@ export class AuthApiService {
   private base = environment.apiUrl + "/api/auth"
   private tokenUrl = environment.tokenUrl
   private clientId = "micro-service-api"
-  private clientSecret = "Ozi5txotULzpa2WPdEFxgYViuJeiwBaF"
+  private clientSecret = "E3lXvxbU8Ebxoy71tvxdw1l7V778EYwW"
 
   constructor(
     private http: HttpClient,

@@ -24,7 +24,7 @@ export class AuthStateService {
 
   async logout(): Promise<void> {
     // This TERMINATES the Keycloak SSO session
-    await this.keycloakService.logout('http://localhost:4200/auth/login');
+    await this.keycloakService.logout('http://localhost:4200/');
 
     // Optional local cleanup
     sessionStorage.clear();

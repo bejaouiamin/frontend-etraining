@@ -1,0 +1,292 @@
+<!-- category.component.html -->
+<div class="category-container">
+  <!-- Background overlay -->
+  <div class="background-overlay"></div>
+
+  <div class="content-wrapper">
+    <!-- Header section -->
+    <div class="header-section">
+      <h1 class="main-title">Welcome back, ready for your next lesson?</h1>
+      <button mat-button class="view-history-btn">
+        View history
+        <mat-icon>arrow_forward</mat-icon>
+      </button>
+    </div>
+
+    <!-- Courses grid -->
+    <div class="courses-grid">
+      <!-- Course Card 1 -->
+      <mat-card class="course-card">
+        <div class="image-container">
+          <img src="images/meet.jpg" alt="AWS Certified Solutions Architect" class="course-image">
+          <div class="image-overlay"></div>
+        </div>
+
+        <mat-card-content>
+          <h2 class="course-title">AWS Certified Solutions Architect</h2>
+
+          <div class="instructor-section">
+            <img src="images/student.png" alt="Lina" class="instructor-avatar">
+            <span class="instructor-name">Lina</span>
+          </div>
+
+          <div class="progress-section">
+            <mat-progress-bar mode="determinate" value="72" class="progress-bar">
+            </mat-progress-bar>
+            <div class="progress-text">
+              Lesson 5 of 7
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Course Card 2 -->
+      <mat-card class="course-card">
+        <div class="image-container">
+          <img src="images/bureau.jpg" alt="Angular Advanced Patterns" class="course-image">
+          <div class="image-overlay"></div>
+        </div>
+
+        <mat-card-content>
+          <h2 class="course-title">Angular Advanced Patterns</h2>
+
+          <div class="instructor-section">
+            <img src="images/student.png" alt="David" class="instructor-avatar">
+            <span class="instructor-name">David</span>
+          </div>
+
+          <div class="progress-section">
+            <mat-progress-bar mode="determinate" value="45" class="progress-bar">
+            </mat-progress-bar>
+            <div class="progress-text">
+              Lesson 5 of 11
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Course Card 3 -->
+      <mat-card class="course-card">
+        <div class="image-container">
+          <img src="images/computer.jpg" alt="Spring Boot Microservices" class="course-image">
+          <div class="image-overlay"></div>
+        </div>
+
+        <mat-card-content>
+          <h2 class="course-title">Spring Boot Microservices</h2>
+
+          <div class="instructor-section">
+            <img src="images/student.png" alt="Sophia" class="instructor-avatar">
+            <span class="instructor-name">Sophia</span>
+          </div>
+
+          <div class="progress-section">
+            <mat-progress-bar mode="determinate" value="85" class="progress-bar">
+            </mat-progress-bar>
+            <div class="progress-text">
+              Lesson 17 of 20
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+  </div>
+  <!-- Navigation buttons -->
+  <div class="navigation-buttons">
+    <button mat-flat-button class="nav-btn prev-btn">
+      <mat-icon>chevron_left</mat-icon>
+    </button>
+    <button mat-flat-button class="nav-btn next-btn">
+      <mat-icon>chevron_right</mat-icon>
+    </button>
+  </div>
+</div>
+
+<!-- Top Categories Section -->
+<div class="top-categories-container">
+  <!-- Section Title - MAINTENANT AU-DESSUS -->
+  <div class="section-header">
+    <h2 class="top-category-title mat-typography">
+      Choice favourite course from top category
+    </h2>
+  </div>
+
+  <!-- Categories Grid -->
+  <div class="categories-grid">
+    <div class="category-card" [ngClass]="getColorClass(i)" *ngFor="let cat of categories; let i = index">
+      <img [src]="iconPath(cat)" [alt]="cat.name + ' icon'" class="category-icon" (error)="onIconError($event)">
+      <h3>{{ cat.name }}</h3>
+      <p>{{ cat.description }}</p>
+    </div>
+  </div>
+</div>
+
+<!-- Recommended for you Section -->
+<div class="recommended-container">
+  <!-- Background overlay -->
+  <div class="recommended-overlay"></div>
+
+  <div class="recommended-content">
+    <!-- Header -->
+    <div class="recommended-header">
+      <h2 class="recommended-title">Recommended for you</h2>
+      <button mat-button class="see-all-btn">
+        See all
+      </button>
+    </div>
+
+    <!-- Courses Grid -->
+    <div class="recommended-grid">
+      <!-- Course Card 1 -->
+      <mat-card class="recommended-card">
+        <div class="card-image-container">
+          <img src="images/meet.jpg" alt="AWS Certified solutions Architect" class="card-image">
+          <div class="card-image-overlay"></div>
+        </div>
+
+        <mat-card-content class="card-content">
+          <div class="card-meta">
+            <span class="card-category">
+              <mat-icon class="category-icon-small">apps</mat-icon>
+              Design
+            </span>
+            <span class="card-duration">
+              <mat-icon class="duration-icon">schedule</mat-icon>
+              3 Month
+            </span>
+          </div>
+
+          <h3 class="card-title">AWS Certified solutions Architect</h3>
+          <p class="card-description">Lorem ipsum dolor sit amet, consectetur adipising elit, sed do eiusmod tempor</p>
+
+          <div class="card-footer">
+            <div class="instructor-info">
+              <img src="images/student.png" alt="Lina" class="instructor-img">
+              <span class="instructor-name">Lina</span>
+            </div>
+            <div class="pricing">
+              <span class="price-old">$100</span>
+              <span class="price-new">$80</span>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Course Card 2 -->
+      <mat-card class="recommended-card">
+        <div class="card-image-container">
+          <img src="images/bureau.jpg" alt="AWS Certified solutions Architect" class="card-image">
+          <div class="card-image-overlay"></div>
+        </div>
+
+        <mat-card-content class="card-content">
+          <div class="card-meta">
+            <span class="card-category">
+              <mat-icon class="category-icon-small">apps</mat-icon>
+              Design
+            </span>
+            <span class="card-duration">
+              <mat-icon class="duration-icon">schedule</mat-icon>
+              3 Month
+            </span>
+          </div>
+
+          <h3 class="card-title">AWS Certified solutions Architect</h3>
+          <p class="card-description">Lorem ipsum dolor sit amet, consectetur adipising elit, sed do eiusmod tempor</p>
+
+          <div class="card-footer">
+            <div class="instructor-info">
+              <img src="images/student.png" alt="Lina" class="instructor-img">
+              <span class="instructor-name">Lina</span>
+            </div>
+            <div class="pricing">
+              <span class="price-old">$100</span>
+              <span class="price-new">$80</span>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Course Card 3 -->
+      <mat-card class="recommended-card">
+        <div class="card-image-container">
+          <img src="images/computer.jpg" alt="AWS Certified solutions Architect" class="card-image">
+          <div class="card-image-overlay"></div>
+        </div>
+
+        <mat-card-content class="card-content">
+          <div class="card-meta">
+            <span class="card-category">
+              <mat-icon class="category-icon-small">apps</mat-icon>
+              Design
+            </span>
+            <span class="card-duration">
+              <mat-icon class="duration-icon">schedule</mat-icon>
+              3 Month
+            </span>
+          </div>
+
+          <h3 class="card-title">AWS Certified solutions Architect</h3>
+          <p class="card-description">Lorem ipsum dolor sit amet, consectetur adipising elit, sed do eiusmod tempor</p>
+
+          <div class="card-footer">
+            <div class="instructor-info">
+              <img src="images/student.png" alt="Lina" class="instructor-img">
+              <span class="instructor-name">Lina</span>
+            </div>
+            <div class="pricing">
+              <span class="price-old">$100</span>
+              <span class="price-new">$80</span>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Course Card 4 -->
+      <mat-card class="recommended-card">
+        <div class="card-image-container">
+          <img src="images/meet.jpg" alt="AWS Certified solutions Architect" class="card-image">
+          <div class="card-image-overlay"></div>
+        </div>
+
+        <mat-card-content class="card-content">
+          <div class="card-meta">
+            <span class="card-category">
+              <mat-icon class="category-icon-small">apps</mat-icon>
+              Design
+            </span>
+            <span class="card-duration">
+              <mat-icon class="duration-icon">schedule</mat-icon>
+              3 Month
+            </span>
+          </div>
+
+          <h3 class="card-title">AWS Certified solutions Architect</h3>
+          <p class="card-description">Lorem ipsum dolor sit amet, consectetur adipising elit, sed do eiusmod tempor</p>
+
+          <div class="card-footer">
+            <div class="instructor-info">
+              <img src="images/student.png" alt="Lina" class="instructor-img">
+              <span class="instructor-name">Lina</span>
+            </div>
+            <div class="pricing">
+              <span class="price-old">$100</span>
+              <span class="price-new">$80</span>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Navigation Arrows -->
+    <div class="recommended-nav">
+      <button mat-mini-fab class="nav-arrow prev-arrow">
+        <mat-icon>chevron_left</mat-icon>
+      </button>
+      <button mat-mini-fab class="nav-arrow next-arrow">
+        <mat-icon>chevron_right</mat-icon>
+      </button>
+    </div>
+  </div>
+</div>

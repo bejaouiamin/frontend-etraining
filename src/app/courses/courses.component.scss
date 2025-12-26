@@ -1,0 +1,45 @@
+// courses.component.scss
+:host {
+  display: block;
+  min-height: 100vh;
+}
+
+// Style profond pour changer le background du header
+::ng-deep app-header {
+  .header { // Assurez-vous que c'est la bonne classe
+    background: linear-gradient(90deg, #49BBBD 0%, #252641 100%) !important;
+    color: white !important; // Pour changer la couleur du texte
+
+
+  }
+}
+
+
+// Espacement entre header et category
+app-category {
+  display: block;
+  margin-top: 70px;
+  padding-top: 20px;
+}
+
+// Responsive
+@media (max-width: 1200px) {
+  app-category {
+    margin-top: 25px;
+    padding-top: 15px;
+  }
+}
+
+@media (max-width: 768px) {
+  app-category {
+    margin-top: 20px;
+    padding-top: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  app-category {
+    margin-top: 15px;
+    padding-top: 5px;
+  }
+}

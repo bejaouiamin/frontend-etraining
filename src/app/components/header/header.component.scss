@@ -4,13 +4,13 @@
   left: 0;
   right: 0;
   z-index: 100;
-  padding: 20px 0;
+  padding: 15px 0;
 }
 
 .header-container {
   max-width: 1440px;
   margin: 0 auto;
-  padding: 0 140px;
+  padding: 0 80px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -26,26 +26,26 @@
 
 .logo {
    position: relative;
-  font-size: 32px;
+  font-size: 26px;
   font-weight: 700;
   font-family: 'Poppins', sans-serif;
   color: white;
   text-decoration: none;
-  letter-spacing: 1.28px;
+  letter-spacing: 1.04px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 83px;
-  min-height: 83px;
+  min-width: 66px;
+  min-height: 66px;
   z-index: 1;
 
   &::before {
     content: '';
     position: absolute;
-    width: 83px;
-    height: 83px;
-    border: 3px solid #00FFF0; /* outline only */
-    border-radius: 6px;
+    width: 66px;
+    height: 66px;
+    border: 2.5px solid #00FFF0; /* outline only */
+    border-radius: 5px;
     transform: rotate(45deg);
     z-index: -1;
     background: transparent;
@@ -54,19 +54,19 @@
 
 .nav-links {
   display: flex;
-  gap: 50px;
+  gap: 35px;
 
   @media (max-width: 1024px) {
     display: none;
   }
 
   .nav-link {
-    font-size: 22px;
+    font-size: 18px;
     font-weight: 400;
     font-family: 'Poppins', sans-serif;
     color: white;
     text-decoration: none;
-    letter-spacing: 0.44px;
+    letter-spacing: 0.36px;
     transition: opacity 0.3s ease;
 
     &:hover {
@@ -95,13 +95,13 @@
 
 .profile-btn {
   color: white !important;
-  width: 48px;
-  height: 48px;
+  width: 40px;
+  height: 40px;
 
   ::ng-deep mat-icon {
-    font-size: 36px;
-    width: 36px;
-    height: 36px;
+    font-size: 30px;
+    width: 30px;
+    height: 30px;
     transition: transform 0.2s ease;
   }
 
@@ -112,18 +112,18 @@
 
 .auth-buttons {
   display: flex;
-  gap: 16px;
+  gap: 12px;
 
   .login-btn {
-    width: 160px;
-    height: 60px;
+    width: 130px;
+    height: 48px;
     background: white;
     border-radius: 80px;
-    font-size: 22px;
+    font-size: 18px;
     font-weight: 500;
     font-family: 'Poppins', sans-serif;
     color: #5B5B5B;
-    letter-spacing: 0.44px;
+    letter-spacing: 0.36px;
     box-shadow: 0px 20px 24px rgba(0, 0, 0, 0.03);
 
     &:hover {
@@ -132,15 +132,15 @@
   }
 
   .signup-btn {
-    width: 160px;
-    height: 60px;
+    width: 130px;
+    height: 48px;
     background: rgba(255, 255, 255, 0.3);
     border-radius: 80px;
-    font-size: 22px;
+    font-size: 18px;
     font-weight: 500;
     font-family: 'Poppins', sans-serif;
     color: white;
-    letter-spacing: 0.44px;
+    letter-spacing: 0.36px;
     box-shadow: 0px 20px 24px rgba(0, 0, 0, 0.03);
 
     &:hover {
