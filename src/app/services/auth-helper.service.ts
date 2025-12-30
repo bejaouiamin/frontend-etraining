@@ -88,13 +88,40 @@ export class AuthHelperService {
    */
   async getKeycloakUserId(): Promise<string | null> {
     try {
-      const token = await this.keycloakService.getToken();
-      if (!token) return null;
+      // First, try to get token from Keycloak service
+      let token: string | null = await this.keycloakService.getToken();
+
+      // If Keycloak doesn't have it, check sessionStorage (direct login flow)
+      if (!token) {
+        token = sessionStorage.getItem('access_token');
+        console.log('[AuthHelper] Using token from sessionStorage');
+      } else {
+        console.log('[AuthHelper] Using token from Keycloak service');
+      }
+
+      if (!token) {
+        console.log('[AuthHelper] No token found in either Keycloak or sessionStorage');
+        return null;
+      }
 
       const decoded = this.decodeToken(token);
+      console.log('[AuthHelper] Decoded token sub:', decoded?.sub);
       return decoded?.sub || null;
     } catch (error) {
-      console.error('Error getting Keycloak user ID:', error);
+      console.error('[AuthHelper] Error getting Keycloak user ID:', error);
+
+      // Fallback: try sessionStorage directly
+      try {
+        const token = sessionStorage.getItem('access_token');
+        if (token) {
+          const decoded = this.decodeToken(token);
+          console.log('[AuthHelper] Fallback - decoded token sub:', decoded?.sub);
+          return decoded?.sub || null;
+        }
+      } catch (fallbackError) {
+        console.error('[AuthHelper] Fallback also failed:', fallbackError);
+      }
+
       return null;
     }
   }

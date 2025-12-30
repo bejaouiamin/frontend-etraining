@@ -14,12 +14,32 @@ export class AuthStateService {
     private router: Router
   ) {
     this.initAuthState();
-    this.isAuthenticatedSubject.next(this.keycloakService.isLoggedIn());
   }
 
   private async initAuthState() {
-    const isLoggedIn = await this.keycloakService.isLoggedIn();
-    this.isAuthenticatedSubject.next(isLoggedIn);
+    try {
+      // Check if we have tokens in sessionStorage (from direct login)
+      const sessionToken = sessionStorage.getItem('access_token');
+
+      // Check Keycloak's internal state
+      const isLoggedIn = await this.keycloakService.isLoggedIn();
+
+      // User is authenticated if either Keycloak knows about it OR we have session tokens
+      const isAuthenticated = isLoggedIn || !!sessionToken;
+
+      console.log('[AuthState] Initial auth check:', {
+        keycloakLoggedIn: isLoggedIn,
+        hasSessionToken: !!sessionToken,
+        finalState: isAuthenticated
+      });
+
+      this.isAuthenticatedSubject.next(isAuthenticated);
+    } catch (error) {
+      console.error('[AuthState] Error checking initial auth state:', error);
+      // Check sessionStorage as fallback
+      const sessionToken = sessionStorage.getItem('access_token');
+      this.isAuthenticatedSubject.next(!!sessionToken);
+    }
   }
 
   async logout(): Promise<void> {

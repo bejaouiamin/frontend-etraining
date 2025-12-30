@@ -330,6 +330,29 @@
   border-radius: 12px;
 }
 
+.main-content {
+  flex: 1;
+  padding: 2rem;
+  overflow-y: auto;
+
+  .forms-tabs {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+    ::ng-deep {
+      .mat-mdc-tab-labels {
+        background: #f5f5f5;
+        border-radius: 8px 8px 0 0;
+      }
+
+      .mat-mdc-tab-body-wrapper {
+        padding: 0;
+      }
+    }
+  }
+}
+
 // Responsive design
 @media (max-width: 1200px) {
   .sidebar {

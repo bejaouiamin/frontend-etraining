@@ -20,6 +20,10 @@ export class LessonService {
     return this.http.get<Lesson[]>(`${this.apiUrl}/theme/${themeId}`);
   }
 
+  getLessonsByFormateur(keycloakId: string): Observable<Lesson[]> {
+    return this.http.get<Lesson[]>(`${this.apiUrl}/formateur/${keycloakId}`);
+  }
+
   getUserProgress(userId: number, lessonId: number): Observable<LessonProgress> {
     return this.http.get<LessonProgress>(
       `${this.apiUrl}/${lessonId}/progress?userId=${userId}`

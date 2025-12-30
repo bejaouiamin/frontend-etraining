@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HeaderComponent } from '../components/header/header.component';
 import { FooterComponent } from '../components/footer/footer.component';
@@ -6,6 +6,19 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { MatTabsModule } from '@angular/material/tabs';
+import { ThemeService } from '../services/theme.service';
+import { AuthHelperService } from '../services/auth-helper.service';
+import { AuthStateService } from '../services/auth-state.service';
+import { Theme } from '../models/theme';
+import { Lesson } from '../models/lesson.model';
+import { Subscription } from 'rxjs';
+import { LessonService } from '../services/lesson.service';
+import { QuizqueryService } from '../services/quizquery.service';
+import { QuizResponse } from '../models/quiz.model';
+import { ThemeFormComponent } from '../components/theme-form/theme-form.component';
+import { LessonFormComponent } from '../components/lesson-form/lesson-form.component';
+import { QuizFormComponent } from '../components/quiz-form/quiz-form.component';
 
 @Component({
   selector: 'app-theme',
@@ -17,45 +30,146 @@ import { MatButtonModule } from '@angular/material/button';
     MatSidenavModule,
     MatListModule,
     MatIconModule,
-    MatButtonModule
+    MatButtonModule,
+    MatTabsModule,
+    ThemeFormComponent,
+    LessonFormComponent,
+    QuizFormComponent
   ],
   templateUrl: './theme.component.html',
   styleUrl: './theme.component.scss'
 })
-export class ThemeComponent {
-  idFormateur = 1; // Replace with actual formateur ID
+export class ThemeComponent implements OnInit, OnDestroy {
+  idFormateur: string | null = null; // Dynamic formateur ID
   isSidebarCollapsed = false;
+  formateurKeycloakId: string | null = null;
+  isFormateurLoggedIn = false;
+  themes: Theme[] = [];
+  lessons: Lesson[] = [];
+  quizzes: QuizResponse[] = [];
+  private authSubscription?: Subscription;
+
+  constructor(
+    private themeService: ThemeService,
+    private lessonService: LessonService,
+    private quizqueryService: QuizqueryService,
+    private authHelper: AuthHelperService,
+    private authState: AuthStateService
+  ) {}
+
+  ngOnInit(): void {
+    // Subscribe to auth state changes
+    this.authSubscription = this.authState.isAuthenticated$.subscribe((isAuth) => {
+      console.log('[Theme] Auth state changed:', isAuth);
+      if (isAuth) {
+        // User is authenticated, load themes and lessons
+        this.loadThemes();
+        this.loadLessons();
+        this.loadQuizzes();
+      } else {
+        // User is not authenticated, clear data
+        this.themes = [];
+        this.lessons = [];
+        this.quizzes = [];
+        this.isFormateurLoggedIn = false;
+        this.formateurKeycloakId = null;
+        this.idFormateur = null;
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.authSubscription?.unsubscribe();
+  }
 
   toggleSidebar() {
     this.isSidebarCollapsed = !this.isSidebarCollapsed;
   }
 
-  lessons = [
-    { id: 1, name: 'Lesson 01 : Introduction about XD', duration: '30 mins', color: 'teal' },
-    { id: 2, name: 'Lesson 01 : Introduction about XD', duration: '30 mins', color: 'orange' },
-    { id: 3, name: 'Lesson 01 : Introduction about XD', duration: '30 mins', color: 'blue' },
-    { id: 4, name: 'Lesson 01 : Introduction about XD', duration: '30 mins', color: 'pink' }
-  ];
+  async loadThemes() {
+    try {
+      // Get the logged-in formateur's keycloakId
+      this.formateurKeycloakId = await this.authHelper.getKeycloakUserId();
 
-  quizzes = [
-    { id: 1, name: 'Lesson 01 : Introduction about XD', duration: '30 mins', color: 'blue' },
-    { id: 2, name: 'Lesson 01 : Introduction about XD', duration: '30 mins', color: 'orange' },
-    { id: 3, name: 'Lesson 01 : Introduction about XD', duration: '30 mins', color: 'blue' },
-    { id: 4, name: 'Lesson 01 : Introduction about XD', duration: '30 mins', color: 'pink' },
-    { id: 5, name: 'Lesson 01 : Introduction about XD', duration: '30 mins', color: 'orange' },
-    { id: 6, name: 'Lesson 01 : Introduction about XD', duration: '30 mins', color: 'orange' },
-    { id: 7, name: 'Lesson 01 : Introduction about XD', duration: '30 mins', color: 'blue' },
-    { id: 8, name: 'Lesson 01 : Introduction about XD', duration: '30 mins', color: 'pink' },
-    { id: 9, name: 'Lesson 01 : Introduction about XD', duration: '30 mins', color: 'blue' },
-    { id: 10, name: 'Lesson 01 : Introduction about XD', duration: '30 mins', color: 'orange' },
-    { id: 11, name: 'Lesson 01 : Introduction about XD', duration: '30 mins', color: 'pink' }
-  ];
+      console.log('[Theme] Keycloak User ID retrieved:', this.formateurKeycloakId);
 
-  themes = [
-    { id: 1, name: 'Design Fundamentals', count: '8 lessons', icon: 'palette', color: 'teal' },
-    { id: 2, name: 'UI/UX Principles', count: '12 lessons', icon: 'layers', color: 'orange' },
-    { id: 3, name: 'Web Development', count: '15 lessons', icon: 'code', color: 'blue' },
-    { id: 4, name: 'Mobile Design', count: '6 lessons', icon: 'phone_android', color: 'pink' },
-    { id: 5, name: 'Prototyping', count: '10 lessons', icon: 'view_quilt', color: 'teal' }
-  ];
+      if (this.formateurKeycloakId) {
+        this.isFormateurLoggedIn = true;
+        this.idFormateur = this.formateurKeycloakId; // Set dynamic formateur ID
+
+        // Fetch themes by formateur's keycloakId
+        this.themeService.getThemesByFormateur(this.formateurKeycloakId).subscribe({
+          next: (themes) => {
+            this.themes = themes;
+            console.log('[Theme] Themes loaded for formateur:', themes);
+          },
+          error: (error) => {
+            console.error('[Theme] Error loading themes:', error);
+            this.isFormateurLoggedIn = false;
+          }
+        });
+      } else {
+        console.log('[Theme] No keycloakId found - user may not be a formateur');
+        this.isFormateurLoggedIn = false;
+      }
+    } catch (error) {
+      console.error('[Theme] Error checking formateur login:', error);
+      this.isFormateurLoggedIn = false;
+    }
+  }
+
+  async loadLessons() {
+    try {
+      const keycloakId = await this.authHelper.getKeycloakUserId();
+
+      if (keycloakId) {
+        this.lessonService.getLessonsByFormateur(keycloakId).subscribe({
+          next: (lessons) => {
+            this.lessons = lessons;
+            console.log('[Theme] Lessons loaded for formateur:', lessons);
+          },
+          error: (error) => {
+            console.error('[Theme] Error loading lessons:', error);
+          }
+        });
+      }
+    } catch (error) {
+      console.error('[Theme] Error loading lessons:', error);
+    }
+  }
+
+  async loadQuizzes() {
+    try {
+      const keycloakId = await this.authHelper.getKeycloakUserId();
+
+      if (keycloakId) {
+        this.quizqueryService.getQuizzesByAuthor(keycloakId).subscribe({
+          next: (quizzes) => {
+            this.quizzes = quizzes;
+            console.log('[Theme] Quizzes loaded for formateur:', quizzes);
+          },
+          error: (error) => {
+            console.error('[Theme] Error loading quizzes:', error);
+          }
+        });
+      }
+    } catch (error) {
+      console.error('[Theme] Error loading quizzes:', error);
+    }
+  }
+
+  onThemeCreated(): void {
+    console.log('[Theme] Theme created, reloading themes...');
+    this.loadThemes();
+  }
+
+  onLessonCreated(): void {
+    console.log('[Theme] Lesson created, reloading lessons...');
+    this.loadLessons();
+  }
+
+  onQuizCreated(): void {
+    console.log('[Theme] Quiz created, reloading quizzes...');
+    this.loadQuizzes();
+  }
 }

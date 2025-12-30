@@ -1,13 +1,13 @@
 import { Resource } from './resource.model';
 
 export interface Lesson {
-  id: number;
+  id?: number;
+  authorKeycloakId: string;
   title: string;
   description: string;
-  duration: number;
-  resources: Resource[];
+  sequenceOrder?: number;
   themeId: number;
-  createdAt: string;
+  resources?: Resource[];
 }
 
 export interface LessonProgress {

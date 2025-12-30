@@ -17,3 +17,24 @@ export interface QuizAttempt {
   passed: boolean;
   attemptedAt: string;
 }
+
+export interface QuizAnswerResponse {
+  id: number;
+  answerText: string;
+  isCorrect: boolean;
+}
+
+export interface QuizQuestionResponse {
+  id: number;
+  questionText: string;
+  answers: QuizAnswerResponse[];
+}
+
+export interface QuizResponse {
+  id: number;
+  title: string;
+  passingScore: number;
+  lessonId: number;
+  authorKeycloakId: string;
+  questions: QuizQuestionResponse[];
+}

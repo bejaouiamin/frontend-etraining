@@ -11,26 +11,26 @@
     <h3 class="theme-title">THEMES</h3>
 
     <div class="theme-section">
-      <div *ngFor="let theme of themes" class="theme-item" [ngClass]="'theme-' + theme.color">
+      <div *ngFor="let theme of themes" class="theme-item theme-teal">
         <div class="theme-content">
-          <mat-icon class="theme-icon">{{ theme.icon }}</mat-icon>
-          <span class="theme-name">{{ theme.name }}</span>
+          <mat-icon class="theme-icon">folder</mat-icon>
+          <span class="theme-name">{{ theme.title }}</span>
         </div>
-        <span class="theme-count">{{ theme.count }}</span>
+        <span class="theme-count">{{ theme.dureeHeures }}</span>
       </div>
     </div>
-    
+
     <!-- Title -->
     <h2 class="sidebar-title">Change Simplification</h2>
 
     <!-- Lessons Section -->
     <div class="lessons-section">
-      <div *ngFor="let lesson of lessons" class="lesson-item" [ngClass]="'lesson-' + lesson.color">
+      <div *ngFor="let lesson of lessons" class="lesson-item lesson-teal">
         <div class="lesson-content">
           <mat-icon class="lesson-icon">play_circle_filled</mat-icon>
-          <span class="lesson-name">{{ lesson.name }}</span>
+          <span class="lesson-name">{{ lesson.title }}</span>
         </div>
-        <span class="lesson-duration">{{ lesson.duration }}</span>
+        <span class="lesson-order" *ngIf="lesson.sequenceOrder" style="color: white;">{{ lesson.sequenceOrder }}</span>
       </div>
     </div>
 
@@ -38,12 +38,12 @@
     <h3 class="quiz-title">PRACTICE QUIZ</h3>
 
     <div class="quiz-section">
-      <div *ngFor="let quiz of quizzes" class="quiz-item" [ngClass]="'quiz-' + quiz.color">
+      <div *ngFor="let quiz of quizzes; let i = index" class="quiz-item" [ngClass]="'quiz-' + (i % 3 === 0 ? 'blue' : i % 3 === 1 ? 'orange' : 'pink')">
         <div class="quiz-content">
           <mat-icon class="quiz-icon">quiz</mat-icon>
-          <span class="quiz-name">{{ quiz.name }}</span>
+          <span class="quiz-name">{{ quiz.title }}</span>
         </div>
-        <span class="quiz-duration">{{ quiz.duration }}</span>
+        <span class="quiz-duration">{{ quiz.passingScore }}%</span>
       </div>
     </div>
 
@@ -52,7 +52,25 @@
 
   <!-- Main Content Area -->
   <main class="main-content">
-    <!-- Content will go here -->
+    <mat-tab-group class="forms-tabs">
+      <mat-tab label="Create Theme">
+        <ng-template matTabContent>
+          <app-theme-form (themeCreated)="onThemeCreated()"></app-theme-form>
+        </ng-template>
+      </mat-tab>
+
+      <mat-tab label="Create Lesson">
+        <ng-template matTabContent>
+          <app-lesson-form (lessonCreated)="onLessonCreated()"></app-lesson-form>
+        </ng-template>
+      </mat-tab>
+
+      <mat-tab label="Create Quiz">
+        <ng-template matTabContent>
+          <app-quiz-form (quizCreated)="onQuizCreated()"></app-quiz-form>
+        </ng-template>
+      </mat-tab>
+    </mat-tab-group>
   </main>
 </div>
 

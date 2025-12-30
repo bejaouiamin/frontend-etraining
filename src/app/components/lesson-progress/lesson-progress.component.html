@@ -5,9 +5,9 @@
       <mat-card-header>
         <mat-icon mat-card-avatar>school</mat-icon>
         <mat-card-title>{{ lesson.title }}</mat-card-title>
-        <mat-card-subtitle>
+        <mat-card-subtitle *ngIf="lesson.resources?.length">
           <mat-icon>schedule</mat-icon>
-          {{ formatDuration(lesson.duration) }}
+          {{ lesson.resources?.length }} ressource(s)
         </mat-card-subtitle>
       </mat-card-header>
 
@@ -52,7 +52,7 @@
         <div class="resources-section">
           <h3>
             <mat-icon>folder</mat-icon>
-            Ressources ({{ lesson.resources.length }})
+            Ressources ({{ lesson.resources?.length || 0 }})
           </h3>
 
           <mat-accordion class="resources-accordion">
@@ -121,9 +121,9 @@
         <mat-card-header>
           <mat-icon mat-card-avatar>menu_book</mat-icon>
           <mat-card-title>{{ lesson.title }}</mat-card-title>
-          <mat-card-subtitle>
-            <mat-icon>schedule</mat-icon>
-            {{ formatDuration(lesson.duration) }}
+          <mat-card-subtitle *ngIf="lesson.resources?.length">
+            <mat-icon>folder</mat-icon>
+            {{ lesson.resources?.length }} ressource(s)
           </mat-card-subtitle>
         </mat-card-header>
 
@@ -133,11 +133,11 @@
           <div class="lesson-meta">
             <div class="meta-item">
               <mat-icon>folder</mat-icon>
-              <span>{{ lesson.resources.length }} ressources</span>
+              <span>{{ lesson.resources?.length || 0 }} ressources</span>
             </div>
-            <div class="meta-item">
-              <mat-icon>event</mat-icon>
-              <span>{{ formatDate(lesson.createdAt) }}</span>
+            <div class="meta-item" *ngIf="lesson.sequenceOrder">
+              <mat-icon>tag</mat-icon>
+              <span>Ordre: {{ lesson.sequenceOrder }}</span>
             </div>
           </div>
         </mat-card-content>
