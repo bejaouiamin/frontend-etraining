@@ -1,0 +1,59 @@
+<app-header></app-header>
+
+<div class="theme-container">
+  <!-- Left Sidebar -->
+  <aside class="sidebar" [class.collapsed]="isSidebarCollapsed">
+    <!-- Menu Icon -->
+    <button class="menu-icon" (click)="toggleSidebar()" mat-icon-button>
+      <mat-icon>{{ isSidebarCollapsed ? 'menu' : 'close' }}</mat-icon>
+    </button>
+    <!-- Themes Section -->
+    <h3 class="theme-title">THEMES</h3>
+
+    <div class="theme-section">
+      <div *ngFor="let theme of themes" class="theme-item" [ngClass]="'theme-' + theme.color">
+        <div class="theme-content">
+          <mat-icon class="theme-icon">{{ theme.icon }}</mat-icon>
+          <span class="theme-name">{{ theme.name }}</span>
+        </div>
+        <span class="theme-count">{{ theme.count }}</span>
+      </div>
+    </div>
+    
+    <!-- Title -->
+    <h2 class="sidebar-title">Change Simplification</h2>
+
+    <!-- Lessons Section -->
+    <div class="lessons-section">
+      <div *ngFor="let lesson of lessons" class="lesson-item" [ngClass]="'lesson-' + lesson.color">
+        <div class="lesson-content">
+          <mat-icon class="lesson-icon">play_circle_filled</mat-icon>
+          <span class="lesson-name">{{ lesson.name }}</span>
+        </div>
+        <span class="lesson-duration">{{ lesson.duration }}</span>
+      </div>
+    </div>
+
+    <!-- Practice Quiz Section -->
+    <h3 class="quiz-title">PRACTICE QUIZ</h3>
+
+    <div class="quiz-section">
+      <div *ngFor="let quiz of quizzes" class="quiz-item" [ngClass]="'quiz-' + quiz.color">
+        <div class="quiz-content">
+          <mat-icon class="quiz-icon">quiz</mat-icon>
+          <span class="quiz-name">{{ quiz.name }}</span>
+        </div>
+        <span class="quiz-duration">{{ quiz.duration }}</span>
+      </div>
+    </div>
+
+
+  </aside>
+
+  <!-- Main Content Area -->
+  <main class="main-content">
+    <!-- Content will go here -->
+  </main>
+</div>
+
+<app-footer></app-footer>
