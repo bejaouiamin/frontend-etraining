@@ -9,7 +9,7 @@ import { Candidate } from '../models/candidate';
   providedIn: 'root'
 })
 export class CandidateService {
-  private apiUrl = `${environment.apiUrl}/api/candidats`;
+  private apiUrl = `${environment.apiUrl}/api/v1/candidats`;
 
   constructor(private http: HttpClient) {}
 

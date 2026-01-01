@@ -8,11 +8,11 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTableModule } from '@angular/material/table';
 import { MatChipsModule } from '@angular/material/chips';
-import { QuizService } from '../../services/quiz.service';
 import { CandidateService } from '../../services/candidate.service';
 import { AuthHelperService } from '../../services/auth-helper.service';
 import { QuizAttempt } from '../../models/quiz.model';
 import { Candidate } from '../../models/candidate';
+import { LessonService } from '../../services/lesson.service';
 
 @Component({
   selector: 'app-quiz-attempt',
@@ -31,8 +31,8 @@ import { Candidate } from '../../models/candidate';
   styleUrls: ['./quiz-attempt.component.scss']
 })
 export class QuizAttemptComponent implements OnInit {
+  candidateKeycloakId: string | null = null;
   userId: number | null = null;
-  keycloakUserId: string | null = null;
   resourceId: number = 0;
   score = 0; // Will be calculated from quiz answers
   isLoading = false;
@@ -45,8 +45,8 @@ export class QuizAttemptComponent implements OnInit {
   correctAnswers = 0; // Track correct answers
 
   constructor(
-    private quizService: QuizService,
     private candidateService: CandidateService,
+    private lessonService: LessonService,
     private authHelper: AuthHelperService,
     private route: ActivatedRoute,
     private router: Router,
@@ -55,15 +55,8 @@ export class QuizAttemptComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
     // Get Keycloak user ID (UUID)
-    this.keycloakUserId = await this.authHelper.getKeycloakUserId();
-    console.log('Keycloak User ID:', this.keycloakUserId);
-
-    // Get numeric userId from authentication (fallback)
-    this.userId = await this.authHelper.getUserId();
-    if (!this.userId) {
-      this.userId = this.authHelper.getUserIdFromToken();
-    }
-    console.log('Numeric User ID:', this.userId);
+    this.candidateKeycloakId = await this.authHelper.getKeycloakUserId();
+    console.log('Keycloak User ID:', this.candidateKeycloakId);
 
     // Get resourceId from route parameters
     this.route.paramMap.subscribe(params => {
@@ -73,9 +66,9 @@ export class QuizAttemptComponent implements OnInit {
       }
     });
 
-    if (this.keycloakUserId || this.userId) {
+    if (this.candidateKeycloakId) {
       this.loadCandidateInfo();
-      this.loadQuizHistory();
+      // this.loadQuizHistory(); // TODO: Implement quiz history later
     } else {
       this.snackBar.open('Utilisateur non authentifié', 'Fermer', { duration: 3000 ,verticalPosition: 'top'});
       this.router.navigate(['/auth/login']);
@@ -104,31 +97,23 @@ export class QuizAttemptComponent implements OnInit {
   }
 
   loadCandidateInfo(): void {
-    if (!this.keycloakUserId && !this.userId) return;
+    if (!this.candidateKeycloakId) return;
 
     this.isLoading = true;
-
-    // Try with Keycloak ID first (recommended)
-    if (this.keycloakUserId) {
-      console.log('Loading candidate with Keycloak ID:', this.keycloakUserId);
-
-      this.candidateService.getCandidateByKeycloakId(this.keycloakUserId)
-        .subscribe({
-          next: (candidate) => {
-            console.log('Candidate loaded:', candidate);
-            this.candidate = candidate;
-            this.userId = candidate.id; // Set numeric ID from database
-            this.isLoading = false;
-          },
-          error: (err) => {
-            console.error('Erreur chargement candidat par Keycloak ID:', err);
-            // Fallback to numeric ID if available
-            this.tryLoadByNumericId(err);
-          }
-        });
-    } else if (this.userId) {
-      this.tryLoadByNumericId(null);
-    }
+    this.candidateService.getCandidateByKeycloakId(this.candidateKeycloakId)
+      .subscribe({
+        next: (candidate) => {
+          console.log('Candidate loaded:', candidate);
+          this.candidate = candidate;
+          this.userId = candidate.id; // Set numeric ID from database
+          this.isLoading = false;
+        },
+        error: (err) => {
+          console.error('Erreur chargement candidat par Keycloak ID:', err);
+          this.isLoading = false;
+          this.showErrorMessage(err);
+        }
+      });
   }
 
   private tryLoadByNumericId(previousError: any): void {
@@ -169,22 +154,23 @@ export class QuizAttemptComponent implements OnInit {
     });
   }
 
-  loadQuizHistory(): void {
-    if (!this.userId) return;
-
-    this.quizService.getUserQuizHistory(this.userId)
-      .subscribe({
-        next: (history) => {
-          this.quizHistory = history;
-        },
-        error: (err) => {
-          console.error('Erreur chargement historique:', err);
-        }
-      });
-  }
+  // TODO: Implement quiz history loading when backend endpoint is available
+  // loadQuizHistory(): void {
+  //   if (!this.candidateKeycloakId) return;
+  //
+  //   this.lessonService.getUserQuizHistoryByKeycloakId(this.candidateKeycloakId)
+  //     .subscribe({
+  //       next: (history) => {
+  //         this.quizHistory = history;
+  //       },
+  //       error: (err) => {
+  //         console.error('Erreur chargement historique:', err);
+  //       }
+  //     });
+  // }
 
   submitQuiz(): void {
-    if (!this.userId) {
+    if (!this.candidateKeycloakId) {
       this.snackBar.open('Utilisateur non authentifié', 'Fermer', { duration: 3000 });
       return;
     }
@@ -195,7 +181,7 @@ export class QuizAttemptComponent implements OnInit {
     }
 
     this.isLoading = true;
-    this.quizService.submitQuizAttempt(this.userId, this.resourceId, this.score)
+    this.lessonService.submitQuizAttempt(this.candidateKeycloakId, this.resourceId, this.score)
       .subscribe({
         next: (attempt) => {
           console.log('Quiz soumis:', attempt);
@@ -207,7 +193,7 @@ export class QuizAttemptComponent implements OnInit {
               panelClass: ['success-snackbar']
             });
             this.loadCandidateInfo();
-            this.loadQuizHistory();
+            // this.loadQuizHistory(); // TODO: Uncomment when quiz history is implemented
           } else {
             this.snackBar.open('Quiz échoué. Réessayez !', 'Fermer', {
               duration: 3000,

@@ -4,14 +4,20 @@ export interface QuizAnswer {
 }
 
 export interface QuizSubmission {
-  candidateId: number;
+  candidateKeycloakId: string;
   quizResourceId: number;
   answers: number[];
 }
 
+export interface QuizQuestion {
+  id: number;
+  questionText: string;
+  answers: QuizAnswer[];
+}
+
 export interface QuizAttempt {
   id: number;
-  userId: number;
+  candidateKeycloakId: string;
   resourceId: number;
   score: number;
   passed: boolean;

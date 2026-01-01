@@ -1,109 +1,176 @@
+<app-header></app-header>
 <div class="lesson-progress-container">
-  <!-- Single Lesson View -->
-  <div *ngIf="lessonId && lesson" class="single-lesson-view">
+  <!-- Single Lesson View with Resources -->
+  <div *ngIf="lessonId && lessonWithResources && !isResourceViewOpen" class="single-lesson-view">
     <mat-card class="lesson-card">
       <mat-card-header>
         <mat-icon mat-card-avatar>school</mat-icon>
-        <mat-card-title>{{ lesson.title }}</mat-card-title>
-        <mat-card-subtitle *ngIf="lesson.resources?.length">
-          <mat-icon>schedule</mat-icon>
-          {{ lesson.resources?.length }} ressource(s)
+        <mat-card-title>{{ lessonWithResources.title }}</mat-card-title>
+        <mat-card-subtitle *ngIf="lessonWithResources.resources.length">
+          <mat-icon>folder</mat-icon>
+          {{ lessonWithResources.resources.length }} ressource(s)
         </mat-card-subtitle>
       </mat-card-header>
 
       <mat-card-content>
-        <p class="lesson-description">{{ lesson.description }}</p>
+        <p class="lesson-description">{{ lessonWithResources.description }}</p>
 
-        <!-- Progress Section -->
-        <div class="progress-section" *ngIf="progress">
-          <div class="progress-header">
-            <h3>
-              <mat-icon>trending_up</mat-icon>
-              Votre progression
-            </h3>
-            <mat-chip [class.completed]="progress.completed" class="status-chip">
-              <mat-icon>{{ progress.completed ? 'check_circle' : 'schedule' }}</mat-icon>
-              {{ progress.completed ? 'Terminé' : 'En cours' }}
-            </mat-chip>
-          </div>
-
-          <div class="progress-bar-container">
-            <mat-progress-bar
-              mode="determinate"
-              [value]="progress.completionPercentage"
-              [color]="progress.completed ? 'accent' : 'primary'">
-            </mat-progress-bar>
-            <span class="progress-percentage">{{ progress.completionPercentage }}%</span>
-          </div>
-
-          <div class="progress-dates">
-            <div class="date-info">
-              <mat-icon>play_arrow</mat-icon>
-              <span>Démarré le {{ formatDate(progress.startedAt) }}</span>
-            </div>
-            <div class="date-info" *ngIf="progress.completedAt">
-              <mat-icon>check</mat-icon>
-              <span>Terminé le {{ formatDate(progress.completedAt) }}</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Resources Section -->
+        <!-- Resources Grid -->
         <div class="resources-section">
           <h3>
             <mat-icon>folder</mat-icon>
-            Ressources ({{ lesson.resources?.length || 0 }})
+            Ressources ({{ lessonWithResources.resources.length || 0 }})
           </h3>
 
-          <mat-accordion class="resources-accordion">
-            <mat-expansion-panel *ngFor="let resource of lesson.resources; let i = index">
-              <mat-expansion-panel-header>
-                <mat-panel-title>
-                  <mat-icon [class]="getResourceColor(resource.type)">
+          <div class="resources-grid">
+            <div
+              *ngFor="let resource of lessonWithResources.resources"
+              class="resource-card"
+              [class.completed]="resource.completed"
+              (click)="openResource(resource)">
+
+              <div class="resource-card-header">
+                <div class="resource-icon-wrapper">
+                  <mat-icon [class]="'resource-icon-' + resource.type.toLowerCase()">
                     {{ getResourceIcon(resource.type) }}
                   </mat-icon>
-                  <span class="resource-title">{{ resource.title }}</span>
-                </mat-panel-title>
-                <mat-panel-description>
-                  <mat-chip class="resource-type-chip" [class]="getResourceColor(resource.type)">
+                </div>
+                <div class="resource-info">
+                  <h4 class="resource-title">{{ resource.title }}</h4>
+                  <mat-chip [class]="getResourceBadgeClass(resource.type)">
                     {{ resource.type }}
                   </mat-chip>
-                  <span *ngIf="resource.duration" class="resource-duration">
-                    <mat-icon>schedule</mat-icon>
-                    {{ formatDuration(resource.duration) }}
-                  </span>
-                </mat-panel-description>
-              </mat-expansion-panel-header>
+                </div>
+                <mat-chip *ngIf="resource.completed" class="status-chip completed">
+                  <mat-icon>check_circle</mat-icon>
+                  Complétée
+                </mat-chip>
+              </div>
 
-              <div class="resource-content">
-                <div class="resource-details">
-                  <div *ngIf="resource.url" class="resource-url">
-                    <mat-icon>link</mat-icon>
-                    <a [href]="resource.url" target="_blank">{{ resource.url }}</a>
-                  </div>
-                  <div *ngIf="resource.content" class="resource-text-content">
-                    <p>{{ resource.content }}</p>
-                  </div>
-                  <div *ngIf="resource.passingScore" class="passing-score">
+              <div class="resource-card-content">
+                <div class="resource-meta">
+                  <div class="meta-item" *ngIf="resource.type === ResourceType.QUIZ && resource.passingScore">
                     <mat-icon>grade</mat-icon>
-                    <span>Score minimum requis: {{ resource.passingScore }}%</span>
+                    <span>Score min: {{ resource.passingScore }}%</span>
+                  </div>
+                  <div class="meta-item">
+                    <mat-icon>access_time</mat-icon>
+                    <span>Cliquez pour accéder</span>
                   </div>
                 </div>
+              </div>
 
-                <button
-                  mat-raised-button
-                  color="primary"
-                  (click)="markResourceCompleted(resource.id)"
-                  class="complete-button">
-                  <mat-icon>check_circle</mat-icon>
-                  Marquer comme complété
+              <div class="resource-card-footer">
+                <button mat-button color="primary" (click)="openResource(resource); $event.stopPropagation()">
+                  <mat-icon>open_in_new</mat-icon>
+                  Ouvrir
                 </button>
               </div>
-            </mat-expansion-panel>
-          </mat-accordion>
+            </div>
+          </div>
         </div>
       </mat-card-content>
     </mat-card>
+  </div>
+
+  <!-- Resource View -->
+  <div *ngIf="isResourceViewOpen && selectedResource" class="resource-view">
+    <div class="resource-view-header">
+      <button mat-icon-button (click)="closeResource()" class="close-button">
+        <mat-icon>close</mat-icon>
+      </button>
+      <div class="resource-view-title">
+        <mat-icon>{{ getResourceIcon(selectedResource.type) }}</mat-icon>
+        <h2>{{ selectedResource.title }}</h2>
+      </div>
+      <mat-chip [class]="getResourceBadgeClass(selectedResource.type)">
+        {{ selectedResource.type }}
+      </mat-chip>
+    </div>
+
+    <div class="resource-view-content">
+      <!-- Loading State -->
+      <div *ngIf="isLoadingResource" class="resource-loading">
+        <div class="loader"></div>
+        <p>Chargement de la ressource...</p>
+      </div>
+
+      <!-- Video Player -->
+      <div *ngIf="selectedResource.type === ResourceType.VIDEO && !isLoadingResource" class="video-container">
+        <video
+          controls
+          controlsList="nodownload"
+          (play)="isResourceViewOpen = true"
+          (ended)="markResourceCompleted(selectedResource.id)"
+          class="video-player">
+          <source [src]="selectedResourceUrl" type="video/mp4">
+          Votre navigateur ne supporte pas la lecture de vidéos.
+        </video>
+        <p class="instruction">Regardez la vidéo complètement pour la marquer comme complétée</p>
+      </div>
+
+      <!-- PDF Viewer -->
+      <div *ngIf="selectedResource.type === ResourceType.PDF && !isLoadingResource" class="document-container">
+        <div class="pdf-wrapper">
+          <ngx-extended-pdf-viewer
+            [src]="pdfSrc"
+            [height]="'650px'"
+            [textLayer]="true"
+            [showHandToolButton]="true"
+            [showZoomButtons]="true"
+            [showPrintButton]="true"
+            [showDownloadButton]="false"
+            [showOpenFileButton]="false"
+            [showPresentationModeButton]="false"
+            [showRotateButton]="true"
+            [showSecondaryToolbarButton]="true"
+            [showSidebarButton]="true"
+            [zoom]="'auto'">
+          </ngx-extended-pdf-viewer>
+        </div>
+        <div class="document-actions">
+          <p class="instruction">Consultez le document, puis confirmez votre lecture</p>
+          <button
+            mat-raised-button
+            color="accent"
+            (click)="markResourceCompleted(selectedResource.id)"
+            [disabled]="selectedResource.completed">
+            <mat-icon>check_circle</mat-icon>
+            Marquer comme lu
+          </button>
+        </div>
+      </div>
+
+      <!-- Quiz -->
+      <div *ngIf="selectedResource.type === ResourceType.QUIZ && !isLoadingResource" class="quiz-container">
+        <mat-card class="quiz-info">
+          <mat-card-header>
+            <mat-icon mat-card-avatar>quiz</mat-icon>
+            <mat-card-title>Quiz</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <p>Score minimum requis: {{ selectedResource.passingScore }}%</p>
+            <p>Complétée: {{ selectedResource.completed ? 'Oui' : 'Non' }}</p>
+            <p *ngIf="selectedResource.completedAt" class="completed-date">
+              Complété le: {{ formatDate(selectedResource.completedAt) }}
+            </p>
+          </mat-card-content>
+          <mat-card-actions>
+            <button mat-raised-button color="primary">
+              <mat-icon>play_arrow</mat-icon>
+              Démarrer le Quiz
+            </button>
+          </mat-card-actions>
+        </mat-card>
+      </div>
+    </div>
+
+    <div class="resource-view-footer">
+      <button mat-stroked-button (click)="closeResource()">
+        <mat-icon>arrow_back</mat-icon>
+        Retour aux ressources
+      </button>
+    </div>
   </div>
 
   <!-- Theme Lessons List View -->
@@ -163,8 +230,9 @@
   </div>
 
   <!-- Empty State -->
-  <div *ngIf="!isLoading && !lesson && lessons.length === 0" class="empty-state">
+  <div *ngIf="!isLoading && !lessonWithResources && lessons.length === 0 && !isResourceViewOpen" class="empty-state">
     <mat-icon>sentiment_dissatisfied</mat-icon>
     <p>Aucune leçon disponible</p>
   </div>
 </div>
+

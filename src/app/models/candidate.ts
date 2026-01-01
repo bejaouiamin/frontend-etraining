@@ -1,6 +1,7 @@
 export interface Candidate {
   id: number;
   fullName: string;
+  keycloakId: string;
   email: string;
   phone: string;
   dateInscription: string;

@@ -1,7 +1,7 @@
 export enum ResourceType {
   VIDEO = 'VIDEO',
   QUIZ = 'QUIZ',
-  DOCUMENT = 'DOCUMENT'
+  PDF = 'PDF'
 }
 
 export interface Resource {

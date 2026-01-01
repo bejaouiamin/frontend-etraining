@@ -16,4 +16,8 @@ export class ThemeService {
   getThemesByFormateur(keycloakId: string): Observable<Theme[]> {
     return this.http.get<Theme[]>(`${this.apiUrl}/formateur/${keycloakId}`);
   }
+
+  getAllThemes(): Observable<Theme[]> {
+    return this.http.get<Theme[]>(`${this.apiUrl}/all`);
+  }
 }

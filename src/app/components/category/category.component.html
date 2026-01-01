@@ -3,6 +3,7 @@
   <!-- Background overlay -->
   <div class="background-overlay"></div>
 
+  <!-- Main View -->
   <div class="content-wrapper">
     <!-- Header section -->
     <div class="header-section">
@@ -13,95 +14,75 @@
       </button>
     </div>
 
-    <!-- Courses grid -->
-    <div class="courses-grid">
-      <!-- Course Card 1 -->
-      <mat-card class="course-card">
+    <!-- Loading state -->
+    <div *ngIf="isLoadingHistory" class="loading-container">
+      <mat-spinner diameter="50"></mat-spinner>
+      <p>Chargement de votre historique...</p>
+    </div>
+
+    <!-- Lessons History Grid -->
+    <div *ngIf="!isLoadingHistory && lessonHistory.length > 0" class="courses-grid">
+      <!-- Lesson Card -->
+      <mat-card *ngFor="let lesson of lessonHistory" class="course-card" (click)="goToLesson(lesson.lessonId)">
         <div class="image-container">
-          <img src="images/meet.jpg" alt="AWS Certified Solutions Architect" class="course-image">
+          <img src="images/meet.jpg" [alt]="lesson.lessonTitle" class="course-image">
           <div class="image-overlay"></div>
         </div>
 
         <mat-card-content>
-          <h2 class="course-title">AWS Certified Solutions Architect</h2>
+          <h2 class="course-title">{{ lesson.lessonTitle }}</h2>
 
-          <div class="instructor-section">
-            <img src="images/student.png" alt="Lina" class="instructor-avatar">
-            <span class="instructor-name">Lina</span>
+          <div class="lesson-meta-info">
+            <span class="lesson-sequence">Leçon {{ lesson.sequenceOrder }}</span>
+            <span class="lesson-resources">{{ lesson.completedResources }}/{{ lesson.totalResources }} ressources</span>
           </div>
 
           <div class="progress-section">
-            <mat-progress-bar mode="determinate" value="72" class="progress-bar">
+            <mat-progress-bar
+              mode="determinate"
+              [value]="lesson.progressPercentage"
+              [color]="lesson.fullyCompleted ? 'accent' : 'primary'"
+              class="progress-bar">
             </mat-progress-bar>
             <div class="progress-text">
-              Lesson 5 of 7
+              {{ lesson.progressPercentage | number:'1.0-0' }}% complété
             </div>
           </div>
-        </mat-card-content>
-      </mat-card>
 
-      <!-- Course Card 2 -->
-      <mat-card class="course-card">
-        <div class="image-container">
-          <img src="images/bureau.jpg" alt="Angular Advanced Patterns" class="course-image">
-          <div class="image-overlay"></div>
-        </div>
-
-        <mat-card-content>
-          <h2 class="course-title">Angular Advanced Patterns</h2>
-
-          <div class="instructor-section">
-            <img src="images/student.png" alt="David" class="instructor-avatar">
-            <span class="instructor-name">David</span>
-          </div>
-
-          <div class="progress-section">
-            <mat-progress-bar mode="determinate" value="45" class="progress-bar">
-            </mat-progress-bar>
-            <div class="progress-text">
-              Lesson 5 of 11
-            </div>
-          </div>
-        </mat-card-content>
-      </mat-card>
-
-      <!-- Course Card 3 -->
-      <mat-card class="course-card">
-        <div class="image-container">
-          <img src="images/computer.jpg" alt="Spring Boot Microservices" class="course-image">
-          <div class="image-overlay"></div>
-        </div>
-
-        <mat-card-content>
-          <h2 class="course-title">Spring Boot Microservices</h2>
-
-          <div class="instructor-section">
-            <img src="images/student.png" alt="Sophia" class="instructor-avatar">
-            <span class="instructor-name">Sophia</span>
-          </div>
-
-          <div class="progress-section">
-            <mat-progress-bar mode="determinate" value="85" class="progress-bar">
-            </mat-progress-bar>
-            <div class="progress-text">
-              Lesson 17 of 20
-            </div>
+          <div class="lesson-dates">
+            <span *ngIf="lesson.lastActivityAt" class="date-info">
+              <mat-icon>access_time</mat-icon>
+              Dernière activité: {{ formatDate(lesson.lastActivityAt) }}
+            </span>
+            <mat-chip *ngIf="lesson.fullyCompleted" class="completion-chip completed">
+              <mat-icon>check_circle</mat-icon>
+              Complétée
+            </mat-chip>
+            <mat-chip *ngIf="!lesson.fullyCompleted" class="completion-chip in-progress">
+              <mat-icon>schedule</mat-icon>
+              En cours
+            </mat-chip>
           </div>
         </mat-card-content>
       </mat-card>
     </div>
 
+    <!-- Empty state -->
+    <div *ngIf="!isLoadingHistory && lessonHistory.length === 0" class="empty-state">
+      <mat-icon>sentiment_dissatisfied</mat-icon>
+      <p>Aucune leçon trouvée</p>
+    </div>
+
+    <!-- Navigation buttons -->
+    <div class="navigation-buttons">
+      <button mat-flat-button class="nav-btn prev-btn">
+        <mat-icon>chevron_left</mat-icon>
+      </button>
+      <button mat-flat-button class="nav-btn next-btn">
+        <mat-icon>chevron_right</mat-icon>
+      </button>
+    </div>
   </div>
-  <!-- Navigation buttons -->
-  <div class="navigation-buttons">
-    <button mat-flat-button class="nav-btn prev-btn">
-      <mat-icon>chevron_left</mat-icon>
-    </button>
-    <button mat-flat-button class="nav-btn next-btn">
-      <mat-icon>chevron_right</mat-icon>
-    </button>
-  </div>
-</div>
 
 <!-- Top Categories Section -->
 <div class="top-categories-container">
