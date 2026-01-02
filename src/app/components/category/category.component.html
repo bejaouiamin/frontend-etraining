@@ -8,7 +8,7 @@
     <!-- Header section -->
     <div class="header-section">
       <h1 class="main-title">Welcome back, ready for your next lesson?</h1>
-      <button mat-button class="view-history-btn">
+      <button mat-button class="view-history-btn" (click)="viewHistory()">
         View history
         <mat-icon>arrow_forward</mat-icon>
       </button>
@@ -95,7 +95,10 @@
 
   <!-- Categories Grid -->
   <div class="categories-grid">
-    <div class="category-card" [ngClass]="getColorClass(i)" *ngFor="let cat of categories; let i = index">
+    <div class="category-card"
+         [ngClass]="getColorClass(i)"
+         *ngFor="let cat of categories; let i = index"
+         (click)="goToCategory(cat.id)">
       <img [src]="iconPath(cat)" [alt]="cat.name + ' icon'" class="category-icon" (error)="onIconError($event)">
       <h3>{{ cat.name }}</h3>
       <p>{{ cat.description }}</p>

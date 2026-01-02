@@ -19,11 +19,15 @@ export class AuthApiService {
   ) { }
 
   registerCandidat(payload: CandidatRequest): Observable<any> {
-    return this.http.post<any>(`${this.base}/candidat/register`, payload)
+    return this.http.post(`${this.base}/candidat/register`, payload, {
+      responseType: 'text'
+    })
   }
 
   registerFormateur(payload: FormateurRequest): Observable<any> {
-    return this.http.post<any>(`${this.base}/formateur/register`, payload)
+    return this.http.post(`${this.base}/formateur/register`, payload, {
+      responseType: 'text'
+    })
   }
 
   login(username: string, password: string): Observable<any> {

@@ -1,0 +1,111 @@
+<div class="courses-container">
+  <!-- Hero Section -->
+  <div class="hero-section">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <button mat-icon-button class="back-button" (click)="goBack()">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <h1 class="hero-title">{{ category?.name || 'Courses' }}</h1>
+      <p class="hero-subtitle">{{ category?.description || 'Explore courses in this category' }}</p>
+
+      <!-- Search Bar -->
+      <div class="search-container">
+        <input type="text" placeholder="Search your favourite course" class="search-input">
+        <button mat-raised-button color="primary" class="search-button">Search</button>
+      </div>
+
+      <!-- Filter Chips -->
+      <div class="filter-chips">
+        <button mat-stroked-button class="filter-chip">
+          Subject
+          <mat-icon>expand_more</mat-icon>
+        </button>
+        <button mat-stroked-button class="filter-chip">
+          Partner
+          <mat-icon>expand_more</mat-icon>
+        </button>
+        <button mat-stroked-button class="filter-chip">
+          Program
+          <mat-icon>expand_more</mat-icon>
+        </button>
+        <button mat-stroked-button class="filter-chip">
+          Language
+          <mat-icon>expand_more</mat-icon>
+        </button>
+        <button mat-stroked-button class="filter-chip">
+          Availability
+          <mat-icon>expand_more</mat-icon>
+        </button>
+        <button mat-stroked-button class="filter-chip">
+          Learning Type
+          <mat-icon>expand_more</mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-container">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p>Chargement des cours...</p>
+  </div>
+
+  <!-- Courses Grid -->
+  <div *ngIf="!isLoading" class="courses-grid-section">
+    <div class="courses-grid">
+      <mat-card *ngFor="let theme of themes" class="course-card" (click)="goToTheme(theme.id)">
+        <div class="card-image-container">
+          <img [src]="'images/meet.jpg'" [alt]="theme.title" class="card-image">
+          <div class="card-image-overlay"></div>
+
+          <!-- Enrolled Badge -->
+          <div *ngIf="isEnrolled(theme.id)" class="enrolled-badge">
+            <mat-icon>check_circle</mat-icon>
+            Inscrit
+          </div>
+        </div>
+
+        <mat-card-content class="card-content">
+          <div class="card-meta">
+            <span class="card-category">
+              <mat-icon class="category-icon-small">apps</mat-icon>
+              {{ category?.name || 'Course' }}
+            </span>
+            <span class="card-duration">
+              <mat-icon class="duration-icon">schedule</mat-icon>
+              {{ theme.dureeHeures || 3 }}h
+            </span>
+          </div>
+
+          <h3 class="card-title">{{ theme.title }}</h3>
+          <p class="card-description">{{ theme.description || 'Lorem ipsum dolor sit amet, consectetur adipising elit, sed do eiusmod tempor' }}</p>
+
+          <div class="card-footer">
+            <div class="instructor-info">
+              <img src="images/student.png" alt="Instructor" class="instructor-img">
+              <span class="instructor-name">Instructor</span>
+            </div>
+
+            <!-- Enroll Button -->
+            <button
+              mat-raised-button
+              [color]="isEnrolled(theme.id) ? 'accent' : 'primary'"
+              class="enroll-btn"
+              (click)="enrollToTheme($event, theme.id)"
+              [disabled]="isEnrolled(theme.id)">
+              <mat-icon>{{ isEnrolled(theme.id) ? 'check' : 'add' }}</mat-icon>
+              {{ isEnrolled(theme.id) ? 'Inscrit' : 'S\'inscrire' }}
+            </button>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="themes.length === 0" class="empty-state">
+      <mat-icon>school</mat-icon>
+      <p>Aucun cours disponible dans cette catégorie</p>
+    </div>
+  </div>
+</div>

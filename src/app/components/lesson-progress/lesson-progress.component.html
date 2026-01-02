@@ -143,22 +143,52 @@
 
       <!-- Quiz -->
       <div *ngIf="selectedResource.type === ResourceType.QUIZ && !isLoadingResource" class="quiz-container">
-        <mat-card class="quiz-info">
+        <mat-card class="quiz-form">
           <mat-card-header>
             <mat-icon mat-card-avatar>quiz</mat-icon>
-            <mat-card-title>Quiz</mat-card-title>
+            <mat-card-title>{{ selectedResource.title }}</mat-card-title>
+            <mat-card-subtitle>
+              Score minimum requis: {{ selectedResource.passingScore }}%
+            </mat-card-subtitle>
           </mat-card-header>
+
           <mat-card-content>
-            <p>Score minimum requis: {{ selectedResource.passingScore }}%</p>
-            <p>Complétée: {{ selectedResource.completed ? 'Oui' : 'Non' }}</p>
-            <p *ngIf="selectedResource.completedAt" class="completed-date">
-              Complété le: {{ formatDate(selectedResource.completedAt) }}
-            </p>
+            <div class="quiz-questions" *ngIf="quizQuestions && quizQuestions.length > 0">
+              <div class="question-item" *ngFor="let question of quizQuestions; let i = index">
+                <div class="question-header">
+                  <span class="question-number">Question {{ i + 1 }}</span>
+                  <h3 class="question-text">{{ question.questionText }}</h3>
+                </div>
+
+                <div class="answers-list">
+                  <div 
+                    class="answer-option" 
+                    *ngFor="let answer of question.answers"
+                    [class.selected]="isAnswerSelected(question.id, answer.id)"
+                    (click)="selectAnswer(question.id, answer.id)">
+                    <div class="radio-button">
+                      <div class="radio-inner" *ngIf="isAnswerSelected(question.id, answer.id)"></div>
+                    </div>
+                    <span class="answer-text">{{ answer.answerText }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="no-questions" *ngIf="!quizQuestions || quizQuestions.length === 0">
+              <mat-icon>error_outline</mat-icon>
+              <p>Aucune question disponible pour ce quiz</p>
+            </div>
           </mat-card-content>
+
           <mat-card-actions>
-            <button mat-raised-button color="primary">
-              <mat-icon>play_arrow</mat-icon>
-              Démarrer le Quiz
+            <button 
+              mat-raised-button 
+              color="primary" 
+              (click)="submitQuiz()"
+              [disabled]="!quizQuestions || quizQuestions.length === 0">
+              <mat-icon>check_circle</mat-icon>
+              Soumettre le Quiz
             </button>
           </mat-card-actions>
         </mat-card>

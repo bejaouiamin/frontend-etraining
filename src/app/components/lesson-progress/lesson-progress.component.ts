@@ -58,6 +58,7 @@ export class LessonProgressComponent implements OnInit, OnDestroy {
   pdfSrc?: string | Blob | Uint8Array; // For ngx-extended-pdf-viewer
   private blobUrls: string[] = []; // Track blob URLs for cleanup
   private currentBlob?: Blob; // Store current blob for download
+  selectedAnswers: Map<number, number> = new Map(); // Map<questionId, answerId>
 
   constructor(
     private lessonService: LessonService,
@@ -188,7 +189,26 @@ export class LessonProgressComponent implements OnInit, OnDestroy {
     this.isResourceViewOpen = true;
     this.isLoadingResource = true; // Start loading
 
-    // Pre-load the file when opening the resource
+    // For QUIZ, load questions instead of file
+    if (resource.type === ResourceType.QUIZ) {
+      if (!this.lessonId || !this.candidateKeycloakId) return;
+
+      this.lessonService.getQuizIfLessonConsumed(this.candidateKeycloakId, this.lessonId).subscribe({
+        next: (questions) => {
+          this.quizQuestions = questions;
+          this.isLoadingResource = false;
+          console.log('Quiz questions loaded:', questions);
+        },
+        error: (err) => {
+          console.error('Error loading quiz questions:', err);
+          this.isLoadingResource = false;
+          alert('Erreur lors du chargement du quiz. Veuillez réessayer.');
+        }
+      });
+      return;
+    }
+
+    // Pre-load the file when opening the resource (VIDEO or PDF)
     if (resource.url) {
       const fileName = resource.url.includes('/')
         ? resource.url.substring(resource.url.lastIndexOf('/') + 1)
@@ -281,6 +301,75 @@ export class LessonProgressComponent implements OnInit, OnDestroy {
     this.selectedResourceUrl = undefined;
     this.pdfSrc = undefined;
     this.currentBlob = undefined;
+    this.selectedAnswers.clear();
+  }
+
+  /**
+   * Select an answer for a quiz question
+   */
+  selectAnswer(questionId: number, answerId: number): void {
+    this.selectedAnswers.set(questionId, answerId);
+  }
+
+  /**
+   * Check if an answer is selected for a question
+   */
+  isAnswerSelected(questionId: number, answerId: number): boolean {
+    return this.selectedAnswers.get(questionId) === answerId;
+  }
+
+  /**
+   * Submit quiz answers
+   */
+  submitQuiz(): void {
+    if (!this.quizQuestions || this.quizQuestions.length === 0) return;
+    if (!this.selectedResource || !this.candidateKeycloakId) return;
+
+    // Check if all questions are answered
+    if (this.selectedAnswers.size < this.quizQuestions.length) {
+      alert('Veuillez répondre à toutes les questions avant de soumettre le quiz.');
+      return;
+    }
+
+    // Collect selected answer IDs in order
+    const answerIds: number[] = [];
+    this.quizQuestions.forEach(question => {
+      const selectedAnswerId = this.selectedAnswers.get(question.id);
+      if (selectedAnswerId !== undefined) {
+        answerIds.push(selectedAnswerId);
+      }
+    });
+
+    console.log('Submitting quiz answers to backend:', answerIds);
+
+    // Submit to backend for validation
+    this.lessonService.submitQuizAnswers(
+      this.candidateKeycloakId,
+      this.selectedResource.id,
+      answerIds
+    ).subscribe({
+      next: (attempt) => {
+        console.log('Quiz attempt result:', attempt);
+
+        if (attempt.passed) {
+          // Update local state
+          if (this.lessonWithResources) {
+            const resource = this.lessonWithResources.resources.find(r => r.id === this.selectedResource?.id);
+            if (resource) {
+              resource.completed = true;
+              resource.completedAt = new Date().toISOString();
+            }
+          }
+          alert(`Félicitations! Vous avez réussi le quiz avec ${attempt.score.toFixed(0)}%`);
+        } else {
+          alert(`Score: ${attempt.score.toFixed(0)}%. Score minimum requis: ${this.selectedResource?.passingScore}%. Veuillez réessayer.`);
+        }
+      },
+      error: (err) => {
+        console.error('Error submitting quiz:', err);
+        alert('Erreur lors de la soumission du quiz. Veuillez réessayer.');
+      }
+    });
   }
 
   ngOnDestroy(): void {

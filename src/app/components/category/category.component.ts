@@ -163,6 +163,18 @@ export class CategoryComponent implements OnInit {
     this.router.navigate(['/lessons', lessonId]);
   }
 
+  // Navigate to category themes page
+  goToCategory(categoryId: number | undefined): void {
+    if (categoryId) {
+      this.router.navigate(['/courses', categoryId]);
+    }
+  }
+
+  // Navigate to quiz attempt history
+  viewHistory(): void {
+    this.router.navigate(['/quiz-attempt']);
+  }
+
 }
 
 

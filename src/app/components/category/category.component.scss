@@ -575,10 +575,16 @@
   justify-content: center;
   background: rgba(73, 187, 189, 0.1);
   border: 1px solid rgba(73, 187, 189, 0.2);
+  cursor: pointer;
+  user-select: none;
 
   &:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 12px 24px rgba(73, 187, 189, 0.25);
+  }
+
+  &:active {
+    transform: translateY(-4px) scale(1.01);
   }
 
   .category-icon {

@@ -85,15 +85,19 @@ export class RegisterComponent {
         console.log('Register payload (candidat):', JSON.stringify(candidatData))
 
         this.auth.registerCandidat(candidatData).subscribe({
-          next: () => {
+          next: (keycloakId: string) => {
             this.isLoading = false
-            this.snack.open('Registration successful. Please login.', 'Close', { duration: 4000, verticalPosition: 'top' })
-            this.router.navigate(['/home'])
+            console.log('Registration successful. Keycloak ID:', keycloakId)
+            this.snack.open('Inscription réussie ! Redirection vers la connexion...', 'Fermer', { duration: 4000, verticalPosition: 'top' })
+            setTimeout(() => {
+              this.router.navigate(['/auth/login'])
+            }, 1500)
           },
           error: (err) => {
             this.isLoading = false
             console.error('Registration error:', err)
-            this.snack.open('Registration failed', 'Close', { duration: 5000, verticalPosition: 'top' })
+            const errorMsg = err?.error?.message || 'Erreur lors de l\'inscription'
+            this.snack.open(errorMsg, 'Fermer', { duration: 5000, verticalPosition: 'top' })
           }
         })
       } else {
@@ -104,15 +108,19 @@ export class RegisterComponent {
           password: this.registerForm.value.password
         }
         this.auth.registerFormateur(formateurData).subscribe({
-          next: () => {
+          next: (keycloakId: string) => {
             this.isLoading = false
-            this.snack.open('Registration successful. Please login.', 'Close', { duration: 4000,verticalPosition: 'top' })
-            this.router.navigate(['/home'])
+            console.log('Registration successful. Keycloak ID:', keycloakId)
+            this.snack.open('Inscription réussie ! Redirection vers la connexion...', 'Fermer', { duration: 4000, verticalPosition: 'top' })
+            setTimeout(() => {
+              this.router.navigate(['/auth/login'])
+            }, 1500)
           },
           error: (err) => {
             this.isLoading = false
             console.error('Registration error:', err)
-            this.snack.open('Registration failed', 'Close', { duration: 5000, verticalPosition: 'top' })
+            const errorMsg = err?.error?.message || 'Erreur lors de l\'inscription'
+            this.snack.open(errorMsg, 'Fermer', { duration: 5000, verticalPosition: 'top' })
           }
         })
       }

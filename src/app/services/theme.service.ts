@@ -20,4 +20,8 @@ export class ThemeService {
   getAllThemes(): Observable<Theme[]> {
     return this.http.get<Theme[]>(`${this.apiUrl}/all`);
   }
+
+  getThemesByCategory(categoryId: number): Observable<Theme[]> {
+    return this.http.get<Theme[]>(`${this.apiUrl}/category/${categoryId}`);
+  }
 }

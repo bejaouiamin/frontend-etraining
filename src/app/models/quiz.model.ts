@@ -1,6 +1,7 @@
 export interface QuizAnswer {
-  questionIndex: number;
-  selectedAnswer: number;
+  id: number;
+  answerText: string;
+  correct: boolean;
 }
 
 export interface QuizSubmission {
