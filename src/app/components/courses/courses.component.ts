@@ -13,6 +13,7 @@ import { AuthHelperService } from '../../services/auth-helper.service';
 import { Theme } from '../../models/theme';
 import { Category } from '../../models/category';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { HeaderComponent } from '../header/header.component';
 
 @Component({
   selector: 'app-courses',
@@ -24,7 +25,8 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
     MatIconModule,
     MatProgressSpinnerModule,
     MatChipsModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    HeaderComponent
   ],
   templateUrl: './courses.component.html',
   styleUrls: ['./courses.component.scss']

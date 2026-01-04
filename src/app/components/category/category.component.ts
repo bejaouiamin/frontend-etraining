@@ -18,6 +18,7 @@ import { LessonService } from '../../services/lesson.service';
 import { AuthHelperService } from '../../services/auth-helper.service';
 import { LessonProgressDTO } from '../../models/lesson-progress.dto';
 import { Theme } from '../../models/theme';
+import { RecommendationService, ThemeRecommendation } from '../../services/recommendation.service';
 
 @Component({
   selector: 'app-category',
@@ -44,6 +45,10 @@ export class CategoryComponent implements OnInit {
   candidateKeycloakId: string | null = null;
   isLoadingHistory = false;
 
+  // Recommended themes
+  recommendedThemes: ThemeRecommendation[] = [];
+  isLoadingRecommendations = false;
+
   // Array of color theme classes that will cycle through
   private colorThemes = ['design', 'development', 'data', 'business', 'marketing', 'photography', 'acting', 'business-alt'];
 
@@ -52,6 +57,7 @@ export class CategoryComponent implements OnInit {
     private themeService: ThemeService,
     private lessonService: LessonService,
     private authHelper: AuthHelperService,
+    private recommendationService: RecommendationService,
     private snackBar: MatSnackBar,
     private router: Router
   ) { }
@@ -62,6 +68,8 @@ export class CategoryComponent implements OnInit {
     this.candidateKeycloakId = await this.authHelper.getKeycloakUserId();
     // Load lesson history automatically
     this.loadLessonHistory();
+    // Load recommended themes
+    this.loadRecommendations();
   }
 
   getallcategories() {
@@ -173,6 +181,63 @@ export class CategoryComponent implements OnInit {
   // Navigate to quiz attempt history
   viewHistory(): void {
     this.router.navigate(['/quiz-attempt']);
+  }
+
+  // Load recommended themes for the candidate
+  loadRecommendations(): void {
+    if (!this.candidateKeycloakId) {
+      console.warn('No Keycloak ID available for recommendations');
+      return;
+    }
+
+    this.isLoadingRecommendations = true;
+    this.recommendationService.getRecommendations(this.candidateKeycloakId, 'hybrid', 4).subscribe({
+      next: (response) => {
+        this.recommendedThemes = response.recommendations;
+        this.isLoadingRecommendations = false;
+      },
+      error: (err) => {
+        console.error('Erreur chargement recommandations:', err);
+        this.isLoadingRecommendations = false;
+        // Silently fail - recommendations are optional
+      }
+    });
+  }
+
+  // Navigate to courses page for the theme's category
+  goToTheme(themeId: number): void {
+    // Find the theme to get its category ID
+    const theme = this.themes.find(t => t.id === themeId);
+    if (theme && theme.category && theme.category.id) {
+      this.router.navigate(['/courses', theme.category.id]);
+    } else {
+      // Fallback: load the theme to get category info
+      this.themeService.getThemeById(themeId).subscribe({
+        next: (themeData) => {
+          if (themeData.category && themeData.category.id) {
+            this.router.navigate(['/courses', themeData.category.id]);
+          }
+        },
+        error: (err) => {
+          console.error('Error navigating to theme:', err);
+          this.snackBar.open('Impossible de naviguer vers ce thème', 'Fermer', { duration: 3000 });
+        }
+      });
+    }
+  }
+
+  // Get category icon for recommendation
+  getCategoryIcon(categoryName: string): string {
+    const iconMap: { [key: string]: string } = {
+      'Design': 'palette',
+      'Development': 'code',
+      'Data': 'storage',
+      'Business': 'business',
+      'Marketing': 'campaign',
+      'Photography': 'camera_alt',
+      'Acting': 'theater_comedy'
+    };
+    return iconMap[categoryName] || 'school';
   }
 
 }

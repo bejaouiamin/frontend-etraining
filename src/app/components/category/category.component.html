@@ -120,151 +120,57 @@
       </button>
     </div>
 
+    <!-- Loading state -->
+    <div *ngIf="isLoadingRecommendations" class="loading-container">
+      <mat-spinner diameter="50"></mat-spinner>
+      <p>Chargement des recommandations...</p>
+    </div>
+
+    <!-- Empty state -->
+    <div *ngIf="!isLoadingRecommendations && recommendedThemes.length === 0" class="empty-state">
+      <mat-icon>lightbulb_outline</mat-icon>
+      <p>Aucune recommandation disponible pour le moment</p>
+    </div>
+
     <!-- Courses Grid -->
-    <div class="recommended-grid">
-      <!-- Course Card 1 -->
-      <mat-card class="recommended-card">
+    <div *ngIf="!isLoadingRecommendations && recommendedThemes.length > 0" class="recommended-grid">
+      <!-- Dynamic Course Cards -->
+      <mat-card *ngFor="let theme of recommendedThemes" class="recommended-card" (click)="goToTheme(theme.theme_id)">
         <div class="card-image-container">
-          <img src="images/meet.jpg" alt="AWS Certified solutions Architect" class="card-image">
+          <img src="images/meet.jpg" [alt]="theme.theme_name" class="card-image">
           <div class="card-image-overlay"></div>
         </div>
 
         <mat-card-content class="card-content">
           <div class="card-meta">
             <span class="card-category">
-              <mat-icon class="category-icon-small">apps</mat-icon>
-              Design
+              <mat-icon class="category-icon-small">{{ getCategoryIcon(theme.category) }}</mat-icon>
+              {{ theme.category }}
             </span>
-            <span class="card-duration">
-              <mat-icon class="duration-icon">schedule</mat-icon>
-              3 Month
+            <span class="card-score">
+              <mat-icon class="score-icon">star</mat-icon>
+              {{ (theme.recommendation_score * 100) | number:'1.0-0' }}%
             </span>
           </div>
 
-          <h3 class="card-title">AWS Certified solutions Architect</h3>
-          <p class="card-description">Lorem ipsum dolor sit amet, consectetur adipising elit, sed do eiusmod tempor</p>
+          <h3 class="card-title">{{ theme.theme_name }}</h3>
+          <p class="card-description">Recommandé pour vous par notre algorithme {{ theme.algorithm }}</p>
 
           <div class="card-footer">
-            <div class="instructor-info">
-              <img src="images/student.png" alt="Lina" class="instructor-img">
-              <span class="instructor-name">Lina</span>
+            <div class="recommendation-badge">
+              <mat-icon>recommend</mat-icon>
+              <span>Recommandé</span>
             </div>
-            <div class="pricing">
-              <span class="price-old">$100</span>
-              <span class="price-new">$80</span>
-            </div>
-          </div>
-        </mat-card-content>
-      </mat-card>
-
-      <!-- Course Card 2 -->
-      <mat-card class="recommended-card">
-        <div class="card-image-container">
-          <img src="images/bureau.jpg" alt="AWS Certified solutions Architect" class="card-image">
-          <div class="card-image-overlay"></div>
-        </div>
-
-        <mat-card-content class="card-content">
-          <div class="card-meta">
-            <span class="card-category">
-              <mat-icon class="category-icon-small">apps</mat-icon>
-              Design
-            </span>
-            <span class="card-duration">
-              <mat-icon class="duration-icon">schedule</mat-icon>
-              3 Month
-            </span>
-          </div>
-
-          <h3 class="card-title">AWS Certified solutions Architect</h3>
-          <p class="card-description">Lorem ipsum dolor sit amet, consectetur adipising elit, sed do eiusmod tempor</p>
-
-          <div class="card-footer">
-            <div class="instructor-info">
-              <img src="images/student.png" alt="Lina" class="instructor-img">
-              <span class="instructor-name">Lina</span>
-            </div>
-            <div class="pricing">
-              <span class="price-old">$100</span>
-              <span class="price-new">$80</span>
-            </div>
-          </div>
-        </mat-card-content>
-      </mat-card>
-
-      <!-- Course Card 3 -->
-      <mat-card class="recommended-card">
-        <div class="card-image-container">
-          <img src="images/computer.jpg" alt="AWS Certified solutions Architect" class="card-image">
-          <div class="card-image-overlay"></div>
-        </div>
-
-        <mat-card-content class="card-content">
-          <div class="card-meta">
-            <span class="card-category">
-              <mat-icon class="category-icon-small">apps</mat-icon>
-              Design
-            </span>
-            <span class="card-duration">
-              <mat-icon class="duration-icon">schedule</mat-icon>
-              3 Month
-            </span>
-          </div>
-
-          <h3 class="card-title">AWS Certified solutions Architect</h3>
-          <p class="card-description">Lorem ipsum dolor sit amet, consectetur adipising elit, sed do eiusmod tempor</p>
-
-          <div class="card-footer">
-            <div class="instructor-info">
-              <img src="images/student.png" alt="Lina" class="instructor-img">
-              <span class="instructor-name">Lina</span>
-            </div>
-            <div class="pricing">
-              <span class="price-old">$100</span>
-              <span class="price-new">$80</span>
-            </div>
-          </div>
-        </mat-card-content>
-      </mat-card>
-
-      <!-- Course Card 4 -->
-      <mat-card class="recommended-card">
-        <div class="card-image-container">
-          <img src="images/meet.jpg" alt="AWS Certified solutions Architect" class="card-image">
-          <div class="card-image-overlay"></div>
-        </div>
-
-        <mat-card-content class="card-content">
-          <div class="card-meta">
-            <span class="card-category">
-              <mat-icon class="category-icon-small">apps</mat-icon>
-              Design
-            </span>
-            <span class="card-duration">
-              <mat-icon class="duration-icon">schedule</mat-icon>
-              3 Month
-            </span>
-          </div>
-
-          <h3 class="card-title">AWS Certified solutions Architect</h3>
-          <p class="card-description">Lorem ipsum dolor sit amet, consectetur adipising elit, sed do eiusmod tempor</p>
-
-          <div class="card-footer">
-            <div class="instructor-info">
-              <img src="images/student.png" alt="Lina" class="instructor-img">
-              <span class="instructor-name">Lina</span>
-            </div>
-            <div class="pricing">
-              <span class="price-old">$100</span>
-              <span class="price-new">$80</span>
-            </div>
+            <button mat-button color="primary" class="view-btn" (click)="goToTheme(theme.theme_id); $event.stopPropagation()">
+              Voir le thème
+            </button>
           </div>
         </mat-card-content>
       </mat-card>
     </div>
 
     <!-- Navigation Arrows -->
-    <div class="recommended-nav">
+    <div *ngIf="recommendedThemes.length > 0" class="recommended-nav">
       <button mat-mini-fab class="nav-arrow prev-arrow">
         <mat-icon>chevron_left</mat-icon>
       </button>

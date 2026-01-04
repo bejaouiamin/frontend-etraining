@@ -1,0 +1,365 @@
+<div class="dashboard-container">
+  <!-- Header -->
+  <header class="dashboard-header">
+    <div class="header-content">
+      <h1>
+        <i class="icon">🏢</i>
+        Gestion des Salles
+      </h1>
+      <div class="header-actions">
+        <button class="btn btn-primary" (click)="openCreateSalleModal()">
+          <i class="icon">➕</i>
+          Nouvelle Salle
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Navigation Tabs -->
+  <nav class="nav-tabs">
+    <button
+      class="tab"
+      [class.active]="activeView === 'list'"
+      (click)="switchView('list')">
+      <i class="icon">📋</i>
+      Toutes les Salles
+    </button>
+    <button
+      class="tab"
+      [class.active]="activeView === 'disponibles'"
+      (click)="switchView('disponibles')">
+      <i class="icon">✅</i>
+      Disponibles
+    </button>
+    <button
+      class="tab"
+      [class.active]="activeView === 'reservations'"
+      (click)="loadFormateurReservations(); activeView = 'reservations'">
+      <i class="icon">📅</i>
+      Mes Réservations
+    </button>
+  </nav>
+
+  <!-- Filters Section -->
+  <div class="filters-section" *ngIf="activeView !== 'reservations'">
+    <div class="search-box">
+      <input
+        type="text"
+        [(ngModel)]="searchTerm"
+        (ngModelChange)="applyFilters()"
+        placeholder="Rechercher une salle..."
+        class="search-input">
+      <i class="icon search-icon">🔍</i>
+    </div>
+
+    <div class="filter-group">
+      <label>Statut:</label>
+      <select [(ngModel)]="filterStatus" (ngModelChange)="applyFilters()" class="filter-select">
+        <option value="ALL">Tous</option>
+        <option *ngFor="let status of salleStatuses" [value]="status">
+          {{ getStatusLabel(status) }}
+        </option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div class="loading-overlay" *ngIf="loading">
+    <div class="spinner"></div>
+  </div>
+
+  <!-- Salles List View -->
+  <div class="content-section" *ngIf="activeView !== 'reservations'">
+    <div class="salles-grid" *ngIf="filteredSalles.length > 0">
+      <div class="salle-card" *ngFor="let salle of filteredSalles">
+        <div class="card-header">
+          <h3>{{ salle.nom }}</h3>
+          <span class="status-badge" [ngClass]="getStatusClass(salle.status)">
+            {{ getStatusLabel(salle.status) }}
+          </span>
+        </div>
+
+        <div class="card-body">
+          <div class="card-info">
+            <p class="description">{{ salle.description }}</p>
+
+            <div class="info-row">
+              <i class="icon">👥</i>
+              <span>Capacité: {{ salle.capacite }} personnes</span>
+            </div>
+
+            <div class="info-row">
+              <i class="icon">📍</i>
+              <span>{{ salle.localisation }}</span>
+            </div>
+
+            <div class="equipements" *ngIf="salle.equipements && salle.equipements.length > 0">
+              <strong>Équipements:</strong>
+              <div class="tags">
+                <span class="tag" *ngFor="let equip of salle.equipements">
+                  {{ equip }}
+                </span>
+              </div>
+            </div>
+
+            <div class="photos" *ngIf="salle.photosUrls && salle.photosUrls.length > 0">
+              <img *ngFor="let photo of salle.photosUrls.slice(0, 3)"
+                   [src]="photo"
+                   [alt]="salle.nom"
+                   class="photo-thumbnail">
+            </div>
+          </div>
+        </div>
+
+        <div class="card-footer">
+          <div class="status-controls">
+            <select
+              [value]="salle.status"
+              (change)="updateStatus(salle.id!, $any($event.target).value)"
+              class="status-select">
+              <option *ngFor="let status of salleStatuses" [value]="status">
+                {{ getStatusLabel(status) }}
+              </option>
+            </select>
+          </div>
+
+          <div class="action-buttons">
+            <button class="btn btn-sm btn-info" (click)="viewReservations(salle)" title="Voir réservations">
+              <i class="icon">📅</i>
+            </button>
+            <button
+              class="btn btn-sm btn-success"
+              (click)="openReservationModal(salle)"
+              [disabled]="salle.status !== SalleStatus.DISPONIBLE"
+              title="Réserver">
+              <i class="icon">🔖</i>
+            </button>
+            <button class="btn btn-sm btn-warning" (click)="openEditSalleModal(salle)" title="Modifier">
+              <i class="icon">✏️</i>
+            </button>
+            <button class="btn btn-sm btn-danger" (click)="deleteSalle(salle.id!)" title="Supprimer">
+              <i class="icon">🗑️</i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="empty-state" *ngIf="filteredSalles.length === 0 && !loading">
+      <i class="icon large">🏢</i>
+      <h3>Aucune salle trouvée</h3>
+      <p>Créez votre première salle ou modifiez vos filtres.</p>
+    </div>
+  </div>
+
+  <!-- Reservations View -->
+  <div class="content-section" *ngIf="activeView === 'reservations'">
+    <div class="reservations-header" *ngIf="selectedSalle">
+      <button class="btn btn-secondary" (click)="switchView('list')">
+        <i class="icon">⬅️</i>
+        Retour
+      </button>
+      <h2>Réservations - {{ selectedSalle.nom }}</h2>
+    </div>
+
+    <div class="reservations-list" *ngIf="reservations.length > 0">
+      <div class="reservation-card" *ngFor="let reservation of reservations">
+        <div class="reservation-header">
+          <h4>Réservation #{{ reservation.id }}</h4>
+          <span class="status-badge" [ngClass]="getReservationStatusClass(reservation.status)">
+            {{ reservation.status }}
+          </span>
+        </div>
+
+        <div class="reservation-body">
+          <div class="info-row">
+            <i class="icon">🏢</i>
+            <span>{{ reservation.salle?.nom || 'Salle' }}</span>
+          </div>
+
+          <div class="info-row">
+            <i class="icon">👤</i>
+            <span>Formateur: {{ reservation.formateurKeycloakId }}</span>
+          </div>
+
+          <div class="info-row">
+            <i class="icon">📅</i>
+            <span>Du: {{ reservation.dateDebut | date:'dd/MM/yyyy HH:mm' }}</span>
+          </div>
+
+          <div class="info-row">
+            <i class="icon">📅</i>
+            <span>Au: {{ reservation.dateFin | date:'dd/MM/yyyy HH:mm' }}</span>
+          </div>
+
+          <div class="info-row" *ngIf="reservation.motif">
+            <i class="icon">📝</i>
+            <span>Motif: {{ reservation.motif }}</span>
+          </div>
+        </div>
+
+        <div class="reservation-footer">
+          <button
+            class="btn btn-sm btn-danger"
+            (click)="openCancelModal(reservation.id!)"
+            [disabled]="reservation.status === ReservationStatus.ANNULEE">
+            <i class="icon">❌</i>
+            Annuler
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="empty-state" *ngIf="reservations.length === 0 && !loading">
+      <i class="icon large">📅</i>
+      <h3>Aucune réservation</h3>
+      <p>Il n'y a pas encore de réservations pour cette salle.</p>
+    </div>
+  </div>
+
+  <!-- Salle Modal -->
+  <div class="modal-overlay" *ngIf="showSalleModal" (click)="closeSalleModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>{{ isEditMode ? 'Modifier' : 'Créer' }} une Salle</h2>
+        <button class="btn-close" (click)="closeSalleModal()">✖</button>
+      </div>
+
+      <div class="modal-body">
+        <form class="form">
+          <div class="form-group">
+            <label>Nom *</label>
+            <input type="text" [(ngModel)]="salleForm.nom" name="nom" class="form-control" required>
+          </div>
+
+          <div class="form-group">
+            <label>Description *</label>
+            <textarea [(ngModel)]="salleForm.description" name="description" class="form-control" rows="3" required></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Capacité *</label>
+              <input type="number" [(ngModel)]="salleForm.capacite" name="capacite" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+              <label>Localisation *</label>
+              <input type="text" [(ngModel)]="salleForm.localisation" name="localisation" class="form-control" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Statut</label>
+            <select [(ngModel)]="salleForm.status" name="status" class="form-control">
+              <option *ngFor="let status of salleStatuses" [value]="status">
+                {{ getStatusLabel(status) }}
+              </option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Équipements</label>
+            <div class="dynamic-list">
+              <div class="dynamic-item" *ngFor="let equip of salleForm.equipements; let i = index; trackBy: trackByIndex">
+                <input type="text" [(ngModel)]="salleForm.equipements[i]" [name]="'equip' + i" class="form-control">
+                <button type="button" class="btn btn-sm btn-danger" (click)="removeEquipement(i)">-</button>
+              </div>
+              <button type="button" class="btn btn-sm btn-secondary" (click)="addEquipement()">
+                + Ajouter équipement
+              </button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Photos (URLs)</label>
+            <div class="dynamic-list">
+              <div class="dynamic-item" *ngFor="let photo of salleForm.photosUrls; let i = index; trackBy: trackByIndex">
+                <input type="url" [(ngModel)]="salleForm.photosUrls[i]" [name]="'photo' + i" class="form-control">
+                <button type="button" class="btn btn-sm btn-danger" (click)="removePhoto(i)">-</button>
+              </div>
+              <button type="button" class="btn btn-sm btn-secondary" (click)="addPhoto()">
+                + Ajouter photo
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeSalleModal()">Annuler</button>
+        <button class="btn btn-primary" (click)="saveSalle()">
+          {{ isEditMode ? 'Mettre à jour' : 'Créer' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reservation Modal -->
+  <div class="modal-overlay" *ngIf="showReservationModal" (click)="closeReservationModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Réserver: {{ selectedSalle?.nom }}</h2>
+        <button class="btn-close" (click)="closeReservationModal()">✖</button>
+      </div>
+
+      <div class="modal-body">
+        <form class="form">
+          <div class="form-group">
+            <label>Formateur (Keycloak ID) *</label>
+            <input type="text" [(ngModel)]="reservationForm.formateurKeycloakId" name="formateurId" class="form-control" required>
+          </div>
+
+          <div class="form-group">
+            <label>Date début *</label>
+            <input type="datetime-local" [(ngModel)]="reservationForm.dateDebut" name="dateDebut" class="form-control" required>
+          </div>
+
+          <div class="form-group">
+            <label>Date fin *</label>
+            <input type="datetime-local" [(ngModel)]="reservationForm.dateFin" name="dateFin" class="form-control" required>
+          </div>
+
+          <div class="form-group">
+            <label>Session Formation ID</label>
+            <input type="number" [(ngModel)]="reservationForm.sessionFormationId" name="sessionId" class="form-control">
+          </div>
+
+          <div class="form-group">
+            <label>Motif</label>
+            <textarea [(ngModel)]="reservationForm.motif" name="motif" class="form-control" rows="3"></textarea>
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeReservationModal()">Annuler</button>
+        <button class="btn btn-primary" (click)="createReservation()">Réserver</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cancel Reservation Modal -->
+  <div class="modal-overlay" *ngIf="showCancelModal" (click)="closeCancelModal()">
+    <div class="modal-content modal-sm" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Annuler la réservation</h2>
+        <button class="btn-close" (click)="closeCancelModal()">✖</button>
+      </div>
+
+      <div class="modal-body">
+        <form class="form">
+          <div class="form-group">
+            <label>Raison de l'annulation</label>
+            <textarea [(ngModel)]="cancelReason" name="reason" class="form-control" rows="4" placeholder="Expliquez pourquoi..."></textarea>
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeCancelModal()">Fermer</button>
+        <button class="btn btn-danger" (click)="cancelReservation()">Confirmer l'annulation</button>
+      </div>
+    </div>
+  </div>
+</div>

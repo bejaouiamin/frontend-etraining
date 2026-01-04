@@ -1,4 +1,12 @@
+::ng-deep app-header {
+  .header {
+    background: linear-gradient(135deg, #49BBBD 0%, #3DADAF 50%, #252641 100%) !important;
+    color: white !important;
+  }
+}
 .courses-container {
+  padding-top:97px;
+  padding-bottom: 2rem;
   width: 100%;
   min-height: 100vh;
   background: #F5F7FA;
@@ -7,7 +15,7 @@
 // Hero Section
 .hero-section {
   position: relative;
-  background: linear-gradient(135deg, #49BBBD 0%, #3DADAF 50%, #252641 100%);
+  background: linear-gradient(135deg, #9df0f1 0%, #97c2c3 50%, #9b9de2 100%);
   padding: 2rem 1rem 3rem;
   min-height: 320px;
   display: flex;

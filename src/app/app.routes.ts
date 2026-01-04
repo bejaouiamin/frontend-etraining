@@ -10,6 +10,7 @@ export const routes: Routes = [
   { path: 'careers', loadComponent: () => import('./theme/theme.component').then(m => m.ThemeComponent) },
   { path: 'auth/login', loadComponent: () => import('./auth/login/login.component').then(m => m.LoginComponent) },
   { path: 'auth/register', loadComponent: () => import('./auth/register/register.component').then(m => m.RegisterComponent) },
+  { path: 'salle', loadComponent: () => import('./salle/salle.component').then(m => m.SalleComponent) },
 
   // Lesson and Quiz routes
   { path: 'lessons/:lessonId', loadComponent: () => import('./components/lesson-progress/lesson-progress.component').then(m => m.LessonProgressComponent) },

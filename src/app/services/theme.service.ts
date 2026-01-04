@@ -24,4 +24,7 @@ export class ThemeService {
   getThemesByCategory(categoryId: number): Observable<Theme[]> {
     return this.http.get<Theme[]>(`${this.apiUrl}/category/${categoryId}`);
   }
+  getThemeById(themeId: number): Observable<Theme> {
+    return this.http.get<Theme>(`${this.apiUrl}/${themeId}`);
+  }
 }
